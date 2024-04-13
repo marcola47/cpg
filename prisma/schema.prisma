@@ -12,3 +12,33 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Familia {
+  id        String   @id @default(uuid())
+  nome      String   
+  membros   Pessoa[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Pessoa {
+  id        String   @id @default(uuid())
+  nome      String   
+
+  genitorId String? @unique
+  genitor   Pessoa? @relation("GenitorFilho", fields: [genitorId], references: [id])
+  genitoraId String? @unique
+  genitora   Pessoa? @relation("GenitoraFilho", fields: [genitoraId], references: [id])
+
+  dataNascimento DateTime?  
+  dataFalecimento DateTime?
+
+  filhode    Pessoa? @relation("GenitorFilho") 
+  filhoda   Pessoa? @relation("GenitoraFilho")
+
+  familias Familia[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
