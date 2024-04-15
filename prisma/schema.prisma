@@ -16,10 +16,19 @@ datasource db {
 model Familia {
   id        String   @id @default(uuid())
   nome      String   
-  membros   Pessoa[]
+  membros   FamiliaPessoa[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model FamiliaPessoa{
+  pessoa Pessoa @relation(fields: [pessoaId], references: [id])
+  pessoaId String
+  familia Familia @relation(fields: [familiaId], references: [id])
+  familiaId String
+
+  @@id([pessoaId, familiaId])
 }
 
 model Pessoa {
@@ -37,8 +46,23 @@ model Pessoa {
   filhode    Pessoa? @relation("GenitorFilho") 
   filhoda   Pessoa? @relation("GenitoraFilho")
 
-  familias Familia[]
+  familias FamiliaPessoa[]
+
+  esposo Casamento[] @relation(name: "esposo")
+  esposa Casamento[] @relation(name: "esposa")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Casamento {
+  esposo Pessoa @relation(name: "esposo",fields: [esposoId], references: [id])
+  esposoId String
+  esposa Pessoa @relation(name: "esposa",fields: [esposaId], references: [id])
+  esposaId String
+
+  dataCasamento DateTime?
+  localCasamento String?
+
+  @@id([esposoId, esposaId])
 }
