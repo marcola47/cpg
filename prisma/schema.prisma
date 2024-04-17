@@ -66,3 +66,12 @@ model Casamento {
 
   @@id([esposoId, esposaId])
 }
+
+model User{
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  nome      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
