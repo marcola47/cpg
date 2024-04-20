@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import protectedRoute from "./protected_route";
+import { log } from "console";
 
 export async function GET(req: NextRequest) {
-  if(!await protectedRoute(req)){
+/*   if(!await protectedRoute(req)){
     return new NextResponse(JSON.stringify({error: "Unauthorized"}), {
       status: 401,
     });
-  }
+  } */
 
   const pessoas = await prisma.pessoa.findMany();
 
@@ -16,3 +17,35 @@ export async function GET(req: NextRequest) {
   });
 }
 
+export async function POST(req: NextRequest) {
+/*   if(!await protectedRoute(req)){
+    return new NextResponse(JSON.stringify({error: "Unauthorized"}), {
+      status: 401,
+    });
+  } */
+
+  const data: Pessoa = await req.json();
+  try{
+    const pessoa = await prisma.pessoa.create({
+      data
+    })
+
+    if(data.genitorId || data.genitoraId){
+      const familias = await prisma.familiaPessoa.findMany({
+        where: {
+          pessoaId: data.genitorId || data.genitoraId
+        }
+      });
+      log(familias);  
+    }
+
+    return new NextResponse(JSON.stringify(pessoa), {
+      status: 201,
+    });
+  }catch(e){
+    return new NextResponse(JSON.stringify({error: e}), {
+      status: 500,
+    });
+  }
+  
+}

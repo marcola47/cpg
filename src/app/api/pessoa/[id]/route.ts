@@ -28,16 +28,30 @@ export async function GET(req: NextRequest, context: {params: FindById}) {
 }
 
 export async function PUT(req: NextRequest, context: {params: FindById}) {
-    const data = await req.json();
+    let data = await req.json();
     try{
-        const pessoa = await prisma.pessoa.update({
+        const pessoa = await prisma.pessoa.findFirstOrThrow({
+            where: {
+                id: context.params.id
+            }
+        });
+
+        if(!pessoa){
+            return new NextResponse(JSON.stringify({error: "Pessoa não encontrada"}), {
+                status: 404,
+            });
+        }
+
+        data = {...pessoa, ...data};
+
+        const p = await prisma.pessoa.update({
             where: {
                 id: context.params.id
             },
             data: data
         });
 
-        return new NextResponse(JSON.stringify(pessoa), {
+        return new NextResponse(JSON.stringify(p), {
             status: 200,
         });
     }catch(e) {

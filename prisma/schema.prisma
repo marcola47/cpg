@@ -41,10 +41,18 @@ model Pessoa {
   genitora   Pessoa? @relation("GenitoraFilho", fields: [genitoraId], references: [id])
 
   dataNascimento DateTime?  
+  localNascimento String?
+
+  dataBatismo DateTime?
+  localBatismo String?
+  
   dataFalecimento DateTime?
+  localFalecimento String?
 
   filhode    Pessoa? @relation("GenitorFilho") 
   filhoda   Pessoa? @relation("GenitoraFilho")
+
+  observacoes Json?
 
   familias FamiliaPessoa[]
 
