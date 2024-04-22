@@ -51,6 +51,25 @@ export async function PUT(req: NextRequest, context: {params: FindById}) {
             data: data
         });
 
+        if(data.genitorId || data.genitoraId){
+            const familias = await prisma.familiaPessoa.findMany({
+                where: {
+                    OR: [
+                        {pessoaId: data.genitorId},
+                        {pessoaId: data.genitoraId}
+                    ]
+                }
+            });
+            for(const f of familias){
+                await prisma.familiaPessoa.create({
+                    data: {
+                        familiaId: f.familiaId,
+                        pessoaId: p.id
+                    }
+                });
+            } 
+        }
+
         return new NextResponse(JSON.stringify(p), {
             status: 200,
         });

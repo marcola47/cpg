@@ -33,10 +33,37 @@ export async function POST(req: NextRequest) {
     if(data.genitorId || data.genitoraId){
       const familias = await prisma.familiaPessoa.findMany({
         where: {
-          pessoaId: data.genitorId || data.genitoraId
+          OR:[
+            {
+              pessoaId: data.genitorId
+            },
+            {
+              pessoaId: data.genitoraId
+            }
+          ]
         }
       });
       log(familias);  
+    }
+
+    if(data.idEsposa){
+      const casamento = await prisma.casamento.create({
+        data: {
+          esposaId: data.idEsposa,
+          esposoId: pessoa.id,
+          dataCasamento: data.dataCasamento,
+          localCasamento: data.localCasamento
+        }
+      });
+    }else if(data.idEsposo){
+      const casamento = await prisma.casamento.create({
+        data: {
+          esposaId: pessoa.id,
+          esposoId: data.idEsposo,
+          dataCasamento: data.dataCasamento,
+          localCasamento: data.localCasamento
+        }
+      });
     }
 
     return new NextResponse(JSON.stringify(pessoa), {

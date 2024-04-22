@@ -11,6 +11,7 @@ interface Pessoa {
     localFalecimento?: string;
     dataCasamento?: Date;
     localCasamento?: string;
-    idConjuge?: string;
+    idEsposa?: string;
+    idEsposo?: string;
     observacoes?: object;
 }
