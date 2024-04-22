@@ -6,29 +6,31 @@ type FindById = {
     id: string;
 };
 
-async function findAncestors(id: string, ancestry: PessoaPrisma[]): Promise<PessoaPrisma[]> {
-    const pessoa: PessoaPrisma | null = await prisma.pessoa.findUnique({
-        where:{
+interface Ancestral extends PessoaPrisma{
+    grau: number;
+}
+
+async function findAncestors(id: string, ancestors: Ancestral[], level: number) {
+    const pessoa = await prisma.pessoa.findFirst({
+        where: {
             id
         }
-    })
+    });
 
     if(!pessoa){
-        return ancestry;
+        return ancestors;
     }
 
-    ancestry.push(pessoa);
-
+    ancestors.push({...pessoa, grau: level});
     if(pessoa.genitorId){
-        await findAncestors(pessoa.genitorId, ancestry);
+        await findAncestors(pessoa.genitorId, ancestors, level + 1);
     }
 
     if(pessoa.genitoraId){
-        await findAncestors(pessoa.genitoraId, ancestry);
+        await findAncestors(pessoa.genitoraId, ancestors, level + 1);
     }
 
-    return ancestry;
-    
+    return ancestors;
 }
 
 export async function GET(req: NextRequest, context: { params: FindById }) {
@@ -44,27 +46,19 @@ export async function GET(req: NextRequest, context: { params: FindById }) {
                 status: 404,
             });
         }
+        let FatherAncestors;
+        let MotherAncestors;
 
-        let familiaMaterna;
-        let familiaPaterna;
+        if(pessoa.genitorId)
+            FatherAncestors = await findAncestors(pessoa.genitorId, [], 1);
+        if(pessoa.genitoraId)
+            MotherAncestors = await findAncestors(pessoa.genitoraId, [], 1);
 
-        if(pessoa.genitorId){
-             familiaPaterna = await findAncestors(pessoa.genitorId, []); // [pessoa
-        }
-        
-        if(pessoa.genitoraId){
-            familiaMaterna = await findAncestors(pessoa.genitoraId, []);
-        }
-        
-
-        const familia = {
-            "materna": familiaMaterna?.map(p => p.nome),
-            "paterna": familiaPaterna?.map(p => p.nome),
-            "pessoa": pessoa
-        }
-
-
-        return new NextResponse(JSON.stringify({familia}), {
+        return new NextResponse(JSON.stringify({
+            "Materno": MotherAncestors,
+            "Paterno": FatherAncestors,
+            "Nome": pessoa.nome,
+        }), {
             status: 200,
         });
         
