@@ -12,6 +12,14 @@ export async function GET(req: NextRequest, context: {params: FindByIdFamilia}) 
         where: {
             familiaId: context.params.idFamilia
         }
+        , select:{ 
+            pessoa: {
+                select: {
+                    id: true,
+                    nome: true,
+                }
+            }
+        }
     });
 
     return new NextResponse(JSON.stringify(pessoas), {

@@ -35,9 +35,9 @@ model Pessoa {
   id        String   @id @default(uuid())
   nome      String   
 
-  genitorId String? @unique
+  genitorId String? 
   genitor   Pessoa? @relation("GenitorFilho", fields: [genitorId], references: [id])
-  genitoraId String? @unique
+  genitoraId String? 
   genitora   Pessoa? @relation("GenitoraFilho", fields: [genitoraId], references: [id])
 
   dataNascimento DateTime?  
@@ -49,8 +49,8 @@ model Pessoa {
   dataFalecimento DateTime?
   localFalecimento String?
 
-  filhode    Pessoa? @relation("GenitorFilho") 
-  filhoda   Pessoa? @relation("GenitoraFilho")
+  filhode    Pessoa[] @relation("GenitorFilho") 
+  filhoda   Pessoa[] @relation("GenitoraFilho")
 
   observacoes Json?
 
