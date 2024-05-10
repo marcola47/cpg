@@ -21,9 +21,7 @@ export async function GET(req: NextRequest, context: {params: FindByName}) {
             status: 200,
         });
     }catch(e) {
-        const msgError = (e as PrismaClientKnownRequestError).message;
-
-        return new NextResponse(JSON.stringify({error: msgError}), {
+        return new NextResponse(JSON.stringify({error: "Não foi possível encontrar pessoas com esse nome!"}), {
             status: 500,
         });
     }

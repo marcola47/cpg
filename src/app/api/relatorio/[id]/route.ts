@@ -1,73 +1,81 @@
 import prisma from "@/lib/prisma";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { NextRequest, NextResponse } from "next/server";
 
 type FindById = {
     id: string;
 };
 
-interface Ancestral extends PessoaPrisma{
-    grau: number;
-}
-
-async function findAncestors(id: string, ancestors: Ancestral[], level: number) {
-    const pessoa = await prisma.pessoa.findFirst({
-        where: {
-            id
-        }
-    });
-
-    if(!pessoa){
-        return ancestors;
-    }
-
-    ancestors.push({...pessoa, grau: level});
-    if(pessoa.genitorId){
-        await findAncestors(pessoa.genitorId, ancestors, level + 1);
-    }
-
-    if(pessoa.genitoraId){
-        await findAncestors(pessoa.genitoraId, ancestors, level + 1);
-    }
-
-    return ancestors;
-}
-
-export async function GET(req: NextRequest, context: { params: FindById }) {
+export async function GET(req: NextRequest, context: {params: FindById}) {
     try{
-        let pessoa: PessoaPrisma = await prisma.pessoa.findFirstOrThrow({
+        const relatorio = await prisma.relatorio.findUniqueOrThrow({
             where: {
                 id: context.params.id
             }
         });
 
-        if(!pessoa){
-            return new NextResponse(JSON.stringify({error: "Pessoa não encontrada"}), {
-                status: 404,
-            });
-        }
-        let FatherAncestors;
-        let MotherAncestors;
-
-        if(pessoa.genitorId)
-            FatherAncestors = await findAncestors(pessoa.genitorId, [], 1);
-        if(pessoa.genitoraId)
-            MotherAncestors = await findAncestors(pessoa.genitoraId, [], 1);
-
-        return new NextResponse(JSON.stringify({
-            "Materno": MotherAncestors,
-            "Paterno": FatherAncestors,
-            "Nome": pessoa.nome,
-        }), {
+        return new NextResponse(JSON.stringify(relatorio), {
             status: 200,
         });
-        
-    }catch(e) {
-        const msgError = (e as PrismaClientKnownRequestError).message;
-
-        return new NextResponse(JSON.stringify({error: msgError}), {
+    }catch(e){
+        return new NextResponse(JSON.stringify({error: e}), {
             status: 500,
         });
     }
+}
 
-} 
+export async function PUT(req: NextRequest, context: {params: FindById}) {
+    try{
+        const data = await req.json();
+        const {cpfOrdenador, nomeOrdenador, observacoes, userId, idFamilia } = data;
+        if(!cpfOrdenador || !nomeOrdenador || !userId || !idFamilia){
+            return new NextResponse(JSON.stringify({error: "Dados incompletos"}), {
+                status: 400,
+            });
+        }
+        const r = await prisma.relatorio.findUnique({
+            where: {
+                id: context.params.id
+            }
+        });
+
+        const relatorio = await prisma.relatorio.update({
+            where: {
+                id: context.params.id
+            },
+            data: {
+                cpfOrdenador,
+                nomeOrdenador,
+                observacoes,
+                userId,
+                idFamilia
+            }
+        });
+
+        return new NextResponse(JSON.stringify(relatorio), {
+            status: 200,
+        });
+
+    }catch(e){
+        return new NextResponse(JSON.stringify({error: e}), {
+            status: 500,
+        });
+    }
+}
+
+export async function DELETE(req: NextRequest, context: {params: FindById}) {
+    try{
+        const relatorio = await prisma.relatorio.delete({
+            where: {
+                id: context.params.id
+            }
+        });
+
+        return new NextResponse(JSON.stringify(relatorio), {
+            status: 200,
+        });
+    }catch(e){
+        return new NextResponse(JSON.stringify({error: "Não foi possivel deletar Relatório!"}), {
+            status: 500,
+        });
+    }
+}

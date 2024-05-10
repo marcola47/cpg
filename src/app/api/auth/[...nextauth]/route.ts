@@ -3,11 +3,14 @@ import { AuthOptions, Awaitable } from "next-auth"
 import NextAuth from "next-auth/next"
 import CredentialProvider from "next-auth/providers/credentials"
 import bcrypt from 'bcrypt'
+import { PrismaAdapter } from "@auth/prisma-adapter"
+import { Adapter } from "next-auth/adapters"
 
 
 export const authOptions: AuthOptions = {
     session: {
-        strategy: 'jwt',
+        strategy: "jwt",
+        maxAge: 24 * 60 * 60,
     },
 
     jwt: {
@@ -15,6 +18,8 @@ export const authOptions: AuthOptions = {
     },
 
     secret: process.env.JWT_SECRET,
+
+    adapter: PrismaAdapter(prisma) as Adapter,
     
     providers: [
         CredentialProvider({
@@ -31,6 +36,7 @@ export const authOptions: AuthOptions = {
                 }
             },
 
+
             async authorize(credentials: Record<string, string> | undefined){
                 const user = await prisma.user.findFirst({
                     where: {
@@ -44,17 +50,32 @@ export const authOptions: AuthOptions = {
 
                 const isValid = await bcrypt.compare(credentials?.password, user.password);
                 if(isValid){
-                    return {
-                        id: user.id,
-                        email: user.email,
-                        name: user.nome
-                    }
+                    return user;
                 }
 
                 return null;
             }
         })
-    ]
+    ],
+
+    callbacks: {
+        async jwt({token, user}: {token: any, user: any}){
+            if(user){
+                token.sub = user.id;
+            }
+            return token;
+        }
+        
+        ,
+
+        async session({session, token}){
+            if(token){
+                session.user.id = token.sub as string;
+            }
+            return session;
+        }, 
+      
+    }
 }
 
 const handler = NextAuth(authOptions);

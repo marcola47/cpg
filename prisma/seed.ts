@@ -309,6 +309,43 @@ async function main() {
 
     await addToFamily(pessoa8);
 
+    const familia5 = await prisma.familia.create({
+        data: {
+            nome: "Ricardao"
+        }
+    });
+
+    const ricardao = await prisma.pessoa.create({
+        data: {
+            nome: "Ricardo Ricardao",
+            genitorId: null,
+            genitoraId: null,
+            dataNascimento: new Date("1885-01-01"),
+            localNascimento: "Brasil",
+            dataBatismo: new Date("1886-01-01"),
+            localBatismo: "Brasil",
+            dataFalecimento: null,
+            localFalecimento: null,
+            observacoes: {
+                info: "Ricardao"
+            }
+        }
+    });
+
+    await prisma.familiaPessoa.create({
+        data: {
+            familiaId: familia5.id,
+            pessoaId: ricardao.id
+        }
+    });
+
+    console.log("Data seeded.");
+    console.log("Familia Silva", familia1.id);
+    console.log("Marica", pessoa33.id);
+    console.log("Ricardao", ricardao.id);
+    console.log("Ricardao Familia", familia5.id);
+    console.log("Marcia", pessoa33);
+    
    
 
 

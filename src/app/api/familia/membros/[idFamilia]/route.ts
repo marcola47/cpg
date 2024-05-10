@@ -29,8 +29,9 @@ export async function GET(req: NextRequest, context: {params: FindByIdFamilia}) 
 }
 
 export async function POST(req: NextRequest, context: {params: FindByIdFamilia}) {
-    const {idPessoa} = await req.json();
+    
     try {
+        const {idPessoa} = await req.json();
         const familiaPessoa = await prisma.familiaPessoa.create({
             data: {
                 familiaId: context.params.idFamilia,

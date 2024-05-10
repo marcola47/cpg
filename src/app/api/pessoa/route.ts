@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import protectedRoute from "./protected_route";
 import { log } from "console";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/route";
 
 export async function GET(req: NextRequest) {
 /*   if(!await protectedRoute(req)){
@@ -11,7 +13,7 @@ export async function GET(req: NextRequest) {
   } */
 
   const pessoas = await prisma.pessoa.findMany();
-
+  
   return new NextResponse(JSON.stringify(pessoas), {
     status: 200,
   });

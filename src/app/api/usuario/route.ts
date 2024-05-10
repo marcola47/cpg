@@ -22,28 +22,32 @@ export async function POST(req: NextRequest){
             });
         }
 
-        return new NextResponse(JSON.stringify({
-            "message": "Usuário criado com sucesso!"
+        return new NextResponse(JSON.stringify({message: "Usuário criado com sucesso"
         }), {
             status: 201,
         });
     }catch(e){
-        const msgError = (e as PrismaClientKnownRequestError).message;
 
-        return new NextResponse(JSON.stringify({error: msgError}), {
+        return new NextResponse(JSON.stringify({error: "Erro ao cadastrar usuário"}), {
             status: 500,
         });
     }
 }
 
 export async function GET(req: NextRequest) {
-    const pessoas = await prisma.user.findMany();
+    try{
+        const pessoas = await prisma.user.findMany();
 
-    pessoas.forEach(pessoa => {
-        pessoa.password = '';
-    });
+        pessoas.forEach(pessoa => {
+            pessoa.password = '';
+        });
 
-    return new NextResponse(JSON.stringify(pessoas), {
-        status: 200,
-    });
+        return new NextResponse(JSON.stringify(pessoas), {
+            status: 200,
+        });
+    } catch(e){
+        return new NextResponse(JSON.stringify({error: "Erro ao buscar usuários"}), {
+            status: 500,
+        });
+    }
 }

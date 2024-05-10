@@ -17,15 +17,16 @@ model Familia {
   id        String   @id @default(uuid())
   nome      String   
   membros   FamiliaPessoa[]
+  Relatorio Relatorio[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model FamiliaPessoa{
-  pessoa Pessoa @relation(fields: [pessoaId], references: [id])
+  pessoa Pessoa @relation(fields: [pessoaId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   pessoaId String
-  familia Familia @relation(fields: [familiaId], references: [id])
+  familia Familia @relation(fields: [familiaId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   familiaId String
 
   @@id([pessoaId, familiaId])
@@ -36,9 +37,9 @@ model Pessoa {
   nome      String   
 
   genitorId String? 
-  genitor   Pessoa? @relation("GenitorFilho", fields: [genitorId], references: [id])
+  genitor   Pessoa? @relation("GenitorFilho", fields: [genitorId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   genitoraId String? 
-  genitora   Pessoa? @relation("GenitoraFilho", fields: [genitoraId], references: [id])
+  genitora   Pessoa? @relation("GenitoraFilho", fields: [genitoraId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   dataNascimento DateTime?  
   localNascimento String?
@@ -80,6 +81,20 @@ model User{
   email     String   @unique
   password  String
   nome      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Relatorio Relatorio[]
+}
+
+model Relatorio{
+  id        String   @id @default(uuid())
+  cpfOrdenador String
+  nomeOrdenador String
+  observacoes String?
+  idFamilia  String
+  familia   Familia @relation(fields: [idFamilia], references: [id])
+  userId    String
+  user      User @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

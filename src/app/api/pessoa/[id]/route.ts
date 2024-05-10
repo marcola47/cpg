@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { log } from "console";
 import { NextRequest, NextResponse } from "next/server";
 
 type FindById = {
@@ -19,30 +20,84 @@ export async function GET(req: NextRequest, context: {params: FindById}) {
         });
 
     }catch(e) {
-        const msgError = (e as PrismaClientKnownRequestError).message;
-
-        return new NextResponse(JSON.stringify({error: msgError}), {
+        return new NextResponse(JSON.stringify({error: "Não foi possível encontrar a pessoa!"}), {
             status: 500,
         });
     }
 }
 
+const updateDescedents = async (descedentes: string[]) => {
+    const id = descedentes.shift();
+    if(!id){
+        return;
+    }
+
+    const pessoa = await prisma.pessoa.findFirst({
+        where: {
+            id: id
+        }
+    })
+
+    if(!pessoa){
+        return;
+    }
+
+    const descedentesPessoa = await prisma.pessoa.findMany({
+        where: {
+            OR: [
+                {genitorId: id},
+                {genitoraId: id}
+            ]
+        }
+    });
+
+    const familiaPessoaDelete = await prisma.familiaPessoa.deleteMany({
+        where: {
+            pessoaId: id
+        }
+    });
+
+    const familias = await prisma.familiaPessoa.findMany({
+        where: {
+            OR: [
+                {pessoaId: pessoa.genitorId ? pessoa.genitorId : ''},
+                {pessoaId: pessoa.genitoraId? pessoa.genitoraId : ''}
+            ]
+        }
+    });
+
+    for(const f of familias){
+        const pessoaFamilia = await prisma.familiaPessoa.create({
+            data: {
+                familiaId: f.familiaId,
+                pessoaId: id
+            }
+        });
+    }
+
+    for(const d of descedentesPessoa){
+        console.log(d.id);
+        
+        descedentes.push(d.id);
+    }
+
+    await updateDescedents(descedentes);
+
+}
+
 export async function PUT(req: NextRequest, context: {params: FindById}) {
-    let data = await req.json();
     try{
+        const data = await req.json();
         const pessoa = await prisma.pessoa.findFirstOrThrow({
             where: {
                 id: context.params.id
             }
         });
-
         if(!pessoa){
             return new NextResponse(JSON.stringify({error: "Pessoa não encontrada"}), {
                 status: 404,
             });
         }
-
-        data = {...pessoa, ...data};
 
         const p = await prisma.pessoa.update({
             where: {
@@ -50,33 +105,20 @@ export async function PUT(req: NextRequest, context: {params: FindById}) {
             },
             data: data
         });
-
-        if(data.genitorId || data.genitoraId){
-            const familias = await prisma.familiaPessoa.findMany({
-                where: {
-                    OR: [
-                        {pessoaId: data.genitorId},
-                        {pessoaId: data.genitoraId}
-                    ]
-                }
-            });
-            for(const f of familias){
-                await prisma.familiaPessoa.create({
-                    data: {
-                        familiaId: f.familiaId,
-                        pessoaId: p.id
-                    }
-                });
-            } 
+        
+        
+        if(data.genitorId != pessoa.genitorId || data.genitoraId != pessoa.genitoraId){
+            log("Atualizando familia");
+            let descedentes: string[] = [];
+            descedentes.push(context.params.id);
+            await updateDescedents(descedentes);
         }
 
         return new NextResponse(JSON.stringify(p), {
             status: 200,
         });
     }catch(e) {
-        const msgError = (e as PrismaClientKnownRequestError).message;
-
-        return new NextResponse(JSON.stringify({error: msgError}), {
+        return new NextResponse(JSON.stringify({error: e}), {
             status: 500,
         });
     }
@@ -95,9 +137,7 @@ export async function DELETE(req: NextRequest, context: {params: FindById}) {
             status: 200,
         });
     }catch(e) {
-        const msgError = (e as PrismaClientKnownRequestError).message;
-
-        return new NextResponse(JSON.stringify({error: msgError}), {
+        return new NextResponse(JSON.stringify({error: "Erro ao deletar pessoa!"}), {
             status: 500,
         });
     }
