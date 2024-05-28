@@ -268,7 +268,7 @@ async function main() {
 
     const pessoa7 = await prisma.pessoa.create({
         data: {
-            nome: "Eduarda Souze",
+            nome: "Maria Souza",
             genitorId: null,
             genitoraId: null,
             dataNascimento: new Date("1885-01-01"),
@@ -290,11 +290,39 @@ async function main() {
         }
     });
 
+    const pessoa71= await prisma.pessoa.create({
+        data: {
+            nome: "Eduarda Souze",
+            genitorId: null,
+            genitoraId: pessoa7.id,
+            dataNascimento: new Date("1885-01-01"),
+            localNascimento: "Brasil",
+            dataBatismo: new Date("1886-01-01"),
+            localBatismo: "Brasil",
+            dataFalecimento: null,
+            localFalecimento: null,
+            observacoes: {
+                info: "Primeira Souza"
+            }
+        }
+    });
+
+    await prisma.casamento.create({
+        data: {
+            esposaId: pessoa71.id,
+            esposoId: pessoa6.id,
+            dataCasamento: new Date("1910-01-01"),
+            localCasamento: "Brasil"
+        }
+    });
+
+    
+
     const pessoa8 = await prisma.pessoa.create({
         data: {
             nome: "Henrique Silva Souza",
             genitorId: pessoa6.id,
-            genitoraId: pessoa7.id,
+            genitoraId: pessoa71.id,
             dataNascimento: new Date("1885-01-01"),
             localNascimento: "Brasil",
             dataBatismo: new Date("1886-01-01"),
