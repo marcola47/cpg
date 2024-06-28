@@ -6,32 +6,45 @@ type FindById = {
 };
 
 export async function GET(req: NextRequest, context: {params: FindById}) {
-    try{
+    try {
         const relatorio = await prisma.relatorio.findUniqueOrThrow({
             where: {
                 id: context.params.id
             }
         });
 
-        return new NextResponse(JSON.stringify(relatorio), {
-            status: 200,
-        });
-    }catch(e){
-        return new NextResponse(JSON.stringify({error: e}), {
-            status: 500,
-        });
+        return new NextResponse(
+            JSON.stringify(relatorio), 
+            { status: 200 }
+        );
+    }
+
+    catch (e) {
+        return new NextResponse(
+            JSON.stringify({ error: e }), 
+            { status: 500 }
+        );
     }
 }
 
 export async function PUT(req: NextRequest, context: {params: FindById}) {
-    try{
+    try {
         const data = await req.json();
-        const {cpfOrdenador, nomeOrdenador, observacoes, userId, idFamilia } = data;
-        if(!cpfOrdenador || !nomeOrdenador || !userId || !idFamilia){
-            return new NextResponse(JSON.stringify({error: "Dados incompletos"}), {
-                status: 400,
-            });
+        const { 
+            cpfOrdenador, 
+            nomeOrdenador, 
+            observacoes, 
+            userId, 
+            idFamilia 
+        } = data;
+        
+        if (!cpfOrdenador || !nomeOrdenador || !userId || !idFamilia) {
+            return new NextResponse(
+                JSON.stringify({ error: "Dados incompletos" }), 
+                { status: 400 }
+            );
         }
+
         const r = await prisma.relatorio.findUnique({
             where: {
                 id: context.params.id
@@ -51,31 +64,38 @@ export async function PUT(req: NextRequest, context: {params: FindById}) {
             }
         });
 
-        return new NextResponse(JSON.stringify(relatorio), {
-            status: 200,
-        });
+        return new NextResponse(
+            JSON.stringify(relatorio), 
+            { status: 200 }
+        );
+    }
 
-    }catch(e){
-        return new NextResponse(JSON.stringify({error: e}), {
-            status: 500,
-        });
+    catch (e) {
+        return new NextResponse(
+            JSON.stringify({ error: e }), 
+            { status: 500 }
+        );
     }
 }
 
 export async function DELETE(req: NextRequest, context: {params: FindById}) {
-    try{
+    try {
         const relatorio = await prisma.relatorio.delete({
             where: {
                 id: context.params.id
             }
         });
 
-        return new NextResponse(JSON.stringify(relatorio), {
-            status: 200,
-        });
-    }catch(e){
-        return new NextResponse(JSON.stringify({error: "Não foi possivel deletar Relatório!"}), {
-            status: 500,
-        });
+        return new NextResponse(
+            JSON.stringify(relatorio), 
+            { status: 200 }
+        );
+    }
+
+    catch (e) {
+        return new NextResponse(
+            JSON.stringify({ error: e }), 
+            { status: 500 }
+        );
     }
 }

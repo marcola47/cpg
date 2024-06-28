@@ -2,16 +2,27 @@ import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
-    const casamentos = await prisma.casamento.findMany();
+    try {
+        const casamentos = await prisma.casamento.findMany();
 
-    return new NextResponse(JSON.stringify(casamentos), {
-        status: 200,
-    });
+        return new NextResponse(
+            JSON.stringify(casamentos), 
+            { status: 200 }
+        );
+    }
+
+    catch (e) {
+        return new NextResponse(
+            JSON.stringify({ error: e }), 
+            { status: 500 }
+        );
+    }
 }
 
 export async function POST(req: NextRequest) {
-    try{
+    try {
         const data = await req.json();
+
         const casamento = await prisma.casamento.create({
             data: {
                 dataCasamento: data.dataCasamento,
@@ -21,12 +32,16 @@ export async function POST(req: NextRequest) {
             }
         });
 
-        return new NextResponse(JSON.stringify(casamento), {
-            status: 201,
-        });
-    }catch(e){
-        return new NextResponse(JSON.stringify({error: e}), {
-            status: 500,
-        });
+        return new NextResponse(
+            JSON.stringify(casamento), 
+            { status: 201 }
+        );
+    }
+
+    catch (e) {
+        return new NextResponse(
+            JSON.stringify({ error: e }), 
+            { status: 500 }
+        );
     }
 }

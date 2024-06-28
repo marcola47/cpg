@@ -1,0 +1,225 @@
+$br-c: 50%;
+$br-xxl: 21px;
+$br-xl: 15px;
+$br-l: 12px;
+$br-m: 9px;
+$br-s: 6px;
+$br-xs: 3px;
+
+$w1: 8.3333%;
+$w2: 16.6666%;
+$w3: 25%;
+$w4: 33.3333%;
+$w5: 41.6666%;
+$w6: 50%;
+$w7: 58.3333%;
+$w8: 66.6666%;
+$w9: 75%;
+$w10: 83.3333%;
+$w11: 91.6666%;
+$w12: 100%;
+
+$grey-dark: #333;
+$grey-mid: #454545;
+$grey-light: #666; 
+
+$blue-dark: #23496B;
+$blue-mid: #2a5d8a;
+$blue-light: #58748D;
+
+$purple-dark: #633B9E;
+$purple-light: #843A9D;
+
+$orange-dark: #db521c;
+$orange-mid: #F26E3A;
+$orange-light: #FFA873;
+
+$yellow-dark: darken(#a5a208, 20%);
+$yellow-mid: #f0ec21;
+$yellow-light: #fffd75;
+
+$red-dark: #9F2121;
+$red-mid: #C11919;
+$red-light: #FF3D3D;
+
+$pink-dark: #DB3F79;
+$pink-light: #E45261;
+
+$lilac-light: #843a9d13;
+$lilac-dark: #74338821;
+
+$green-dark: #2E7D32;
+$green-light: #4CAF50;
+
+.t--bold {
+  font-weight: 600;
+}
+
+.t-hl--purple {
+  color: $purple-dark;
+}
+
+.t-hl--orange {
+  color: $orange-mid;
+}
+
+.t-hl--blue {
+  color: $blue-dark;
+}
+
+.t-hl--green {
+  color: $green-dark;
+}
+
+.loader {
+  display: block;
+  position: relative;
+  margin-inline: auto;
+
+  &::before, &::after {
+    content: "";  
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 50%;
+    background-color: #fff;
+
+    transform: scale(0);
+    animation: anim-loader 2s linear infinite;
+  }
+
+  &::after {
+    animation-delay: 1s;
+  }
+
+  @keyframes anim-loader {
+    0% {
+      transform: scale(0);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 0;
+    }
+  }
+
+  &--grey {
+    &::before, &::after {
+      background-color: $grey-light;
+    }
+  }
+
+  &--xs {
+    width: 20px;
+    height: 20px;
+
+    &::before, &::after {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  &--s {
+    width: 32px;
+    height: 32px;
+
+    &::before, &::after {
+      width: 32px;
+      height: 32px;
+    }
+  }
+
+  &--m {
+    width: 64px;
+    height: 64px;
+
+    &::before, &::after {
+      width: 64px;
+      height: 64px;
+    }
+  }
+
+  &--l {
+    width: 128px;
+    height: 128px;
+
+    &::before, &::after {
+      width: 128px;
+      height: 128px;
+    }
+  }
+
+  &--xl {
+    width: 256px;
+    height: 256px;
+
+    &::before, &::after {
+      width: 256px;
+      height: 256px;
+    }
+  }
+}      
+
+@mixin scrollbar_small() {
+  &::-webkit-scrollbar {
+    width: 8px;
+    @include transition;
+  }
+  
+  &::-webkit-scrollbar-track {
+    border-radius: $br-s;
+    // border-top-right-radius: $br-s;
+    // border-bottom-right-radius: $br-s;
+    background: #d8d8d8;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    border-radius: $br-s;
+    // border-top-right-radius: $br-s;
+    // border-bottom-right-radius: $br-s;
+    background: #a8a8a8;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background: #b3b3b3;
+  }
+}
+
+@mixin transition { 
+  transition: all 0.1s ease-in-out;
+}
+
+@keyframes fade-in {
+  from { opacity: 0 }
+  to   { opacity: 1 }
+}
+
+@keyframes loading {
+  0%   { background-color: hsl(200, 0%, 93%) }
+  100% { background-color: hsl(200, 0%, 98%) }
+}
+
+@keyframes pulsing {
+  0%   { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+
+@mixin anim--fade-in--short {
+  animation: fade-in 0.15s ease-in-out forwards;
+}
+
+@mixin anim--fade-in--mid {
+  animation: fade-in 0.5s ease-in-out forwards;
+}
+
+@mixin anim--fade-in--long {
+  animation: fade-in 1s ease-in-out forwards;
+}
+
+@mixin anim--loading {
+  animation: loading 1s linear infinite alternate;
+}
+
+@mixin anim--pulsing {
+  animation: pulsing 3s linear infinite alternate;
+}

@@ -7,28 +7,31 @@ type FindById = {
 }
 
 export async function GET(req: NextRequest, context: {params: FindById}) {
-    try{
+    try {
         const pessoa = await prisma.user.findFirstOrThrow({
             where: {
                 id: context.params.id
             }
         });
 
-        return new NextResponse(JSON.stringify(pessoa), {
-            status: 200,
-        });
-    }catch(e) {
-        return new NextResponse(JSON.stringify({error: e}), {
-            status: 500,
-        });
+        return new NextResponse(
+            JSON.stringify(pessoa), 
+            { status: 200 }
+        );
     }
-    
+
+    catch (e) {
+        return new NextResponse(
+            JSON.stringify({ error: e }), 
+            { status: 500 }
+        );
+    }
 }
 
 export async function PUT(req: NextRequest, context: {params: FindById}) {
-    try{
+    try {
         const data = await req.json();
-        let {nome, email, password} = data;
+        let { nome, email, password } = data;
 
         password = bcrypt.hashSync(password, 10);
 
@@ -43,32 +46,39 @@ export async function PUT(req: NextRequest, context: {params: FindById}) {
             }
         });
 
-        return new NextResponse(JSON.stringify(pessoa), {
-            status: 200,
-        });
+        return new NextResponse(
+            JSON.stringify(pessoa), 
+            { status: 200 }
+        );
 
-    }catch(e) {
-        return new NextResponse(JSON.stringify({error: e}), {
-            status: 500,
-        });
-    } 
+    }
+
+    catch (e) {
+        return new NextResponse(
+            JSON.stringify({ error: e }), 
+            { status: 500 }
+        );
+    }
 }
 
 export async function DELETE(req: NextRequest, context: {params: FindById}) {
-    try{
+    try {
         const pessoa = await prisma.user.delete({
             where: {
                 id: context.params.id
             }
         });
 
-        return new NextResponse(JSON.stringify(pessoa), {
-            status: 200,
-        });
+        return new NextResponse(
+            JSON.stringify(pessoa), 
+            { status: 200 }
+        );
     }
+
     catch(e) {
-        return new NextResponse(JSON.stringify({error: e}), {
-            status: 500,
-        });
+        return new NextResponse(
+            JSON.stringify({ error: e }), 
+            { status: 500 }
+        );
     }
 }

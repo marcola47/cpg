@@ -6,31 +6,26 @@ type FindById = {
     id: string;
 };
 
-async function getDescendants(nivel: string,descendants: string[], family: {[key: string]: {[key: string] : any }}) {
+async function getDescendants(nivel: string,descendants: string[], family: { [key: string]: { [key: string] : any } }) {
     const id: string | undefined = descendants.shift();
-    if (!id) {
+    
+    if (!id) 
         return;
-    }
-
+    
     const pessoa = await prisma.pessoa.findUnique({
         where: {
             id: id
         }
     });
 
-    if(!pessoa){
+    if (!pessoa)
         return;
-    }
 
     const filhos = await prisma.pessoa.findMany({
         where: {
             OR: [
-                {
-                    genitorId: id
-                },
-                {
-                    genitoraId: id
-                }
+                { genitorId: id },
+                { genitoraId: id }
             ]
         },
         orderBy: {
@@ -41,16 +36,14 @@ async function getDescendants(nivel: string,descendants: string[], family: {[key
     const conjuges = await prisma.casamento.findMany({
         where: {
             OR: [
-                {
-                    esposoId: id
-                },
-                {
-                    esposaId: id
-                }
+                { esposoId: id },
+                { esposaId: id }
             ]
-        }, orderBy: {
+        }, 
+        orderBy: {
             dataCasamento: 'asc'
-        }, include: {
+        }, 
+        include: {
             esposo: true,
             esposa: true
         }
@@ -76,7 +69,7 @@ async function getDescendants(nivel: string,descendants: string[], family: {[key
         observacoes: pessoa.observacoes
     }
 
-    for(let c of conjuges){
+    for(let c of conjuges) {
         const idConjuge = c.esposoId === id ? c.esposaId : c.esposoId;
         const paisDoConjuge = await prisma.pessoa.findUnique({
             where: {
@@ -103,12 +96,14 @@ async function getDescendants(nivel: string,descendants: string[], family: {[key
     }
 
     let numFilhos = 0;
-    for(let f of filhos){
+
+    for (let f of filhos) {
         family[id].filhos.push({
             id: f.id,
             genitorId: f.genitorId,
             genitoraId: f.genitoraId,
         });
+
         descendants.push(f.id);
         numFilhos++;
         const nivelFilho = nivel + '.' + numFilhos;
@@ -116,41 +111,43 @@ async function getDescendants(nivel: string,descendants: string[], family: {[key
     }
     
 }
+
 function parseDate(date: Date | null | undefined): string {
-    if(!date){
+    if (!date)
         return 'Desconhecido';
-    }
+    
     return date.toISOString().split('T')[0].replace(/-/g, '/');
 }
 
-
 export async function GET(req: NextRequest, context: { params: FindById }) {
-    try{
+    try {
         const familia = await prisma.familia.findFirst({
             where: {
                 id: context.params.id
             }
         });
         
-        if(!familia){
-            return new NextResponse(JSON.stringify({error: "Familia não encontrada"}), {
-                status: 404,
-            });
+        if (!familia) {
+            return new NextResponse(
+                JSON.stringify({ error: "Familia não encontrada" }), 
+                { status: 404 }
+            );
         }
 
         const PrimeiraPessoa = await prisma.familiaPessoa.findFirst({
             where: {
                 familiaId: familia.id
-                },
-                include: {
-                    pessoa: true
-                }
+            },
+            include: {
+                pessoa: true
+            }
             });
 
-        if(!PrimeiraPessoa){
-            return new NextResponse(JSON.stringify({error: "Familia sem pessoas"}), {
-                status: 404,
-            });
+        if (!PrimeiraPessoa) {
+            return new NextResponse(
+                JSON.stringify({ error: "Familia sem pessoas" }), 
+                { status: 404 }
+            );
         }
 
         let descendants: string[] = [];
@@ -160,7 +157,8 @@ export async function GET(req: NextRequest, context: { params: FindById }) {
         await getDescendants(nivel,descendants, family);
 
         let stringFamily = "";
-        for(const [id, values] of Object.entries(family)){
+        
+        for(const [id, values] of Object.entries(family)) {
             const nivel = values.nivel;
             const info = values.info;
             const filhos = values.filhos;
@@ -173,6 +171,7 @@ export async function GET(req: NextRequest, context: { params: FindById }) {
 
             if (conjuges.length > 0) {
                 stringFamily += `Casou com`;
+                
                 for (const c of conjuges) {
                     stringFamily += `${multipleCasamentos ? 'Também, casou com' : ''} `;
                     stringFamily += `${c.conjuge.nome} ${c.dataCasamento ? "em " + parseDate(c.dataCasamento) : ''} `;
@@ -188,29 +187,37 @@ export async function GET(req: NextRequest, context: { params: FindById }) {
 
             if (filhos.length > 0) {
                 stringFamily += `Constam ${filhos.length} filhos:`;
-                if(conjuges.length > 1){
+                
+                if (conjuges.length > 1) {
                     stringFamily += ' Sendo';
+                    
                     for (const c of conjuges) {
                         let count: number = 0;
+                        
                         for (const f of filhos) {
-                            if(f.genitorId === c.conjuge.id || f.genitoraId === c.conjuge.id){
+                            if (f.genitorId === c.conjuge.id || f.genitoraId === c.conjuge.id)
                                 count++;
-                            }
                         }
+
                         stringFamily += ` $${count} filhos com ${c.conjuge.nome},`;
                     }
                 }
             }
+
             stringFamily += '\n';            
         }   
 
-        return new NextResponse(stringFamily, {
-            status: 200,
-        });
+        return new NextResponse(
+            stringFamily, 
+            { status: 200 }
+        );
 
-    }catch(e){
-        return new NextResponse(JSON.stringify({error: e}), {
-            status: 404,
-        });
+    }
+
+    catch (e) {
+        return new NextResponse(
+            JSON.stringify({ error: e }), 
+            { status: 500 }
+        );
     }
 }

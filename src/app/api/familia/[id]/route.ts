@@ -6,27 +6,32 @@ type FindById = {
 }
 
 export async function GET(req: NextRequest, context: {params: FindById}) {
-    try{
+    try {
         const familia = await prisma.familia.findFirstOrThrow({
             where: {
                 id: context.params.id
             }
         });
 
-        return new NextResponse(JSON.stringify(familia), {
-            status: 200,
-        });
+        return new NextResponse(
+            JSON.stringify(familia), 
+            { status: 200 }
+        );
         
-    }catch(e) {
-        return new NextResponse(JSON.stringify({error: e}), {
-            status: 500,
-        });
+    }
+
+    catch (e) {
+        return new NextResponse(
+            JSON.stringify({ error: e }), 
+            { status: 500 }
+        );
     }
 }
 
 export async function PUT(req: NextRequest, context: {params: FindById}) {
-    const data = await req.json();
-    try{
+    try {
+        const data = await req.json();
+
         const familia = await prisma.familia.update({
             where: {
                 id: context.params.id
@@ -34,31 +39,38 @@ export async function PUT(req: NextRequest, context: {params: FindById}) {
             data: data
         });
 
-        return new NextResponse(JSON.stringify(familia), {
-            status: 200,
-        });
-    }catch(e) {
-        return new NextResponse(JSON.stringify({error: e}), {
-            status: 500,
-        });
+        return new NextResponse(
+            JSON.stringify(familia), 
+            { status: 200 }
+        );
     }
 
+    catch (e) {
+        return new NextResponse(
+            JSON.stringify({ error: e }), 
+            { status: 500 }
+        );
+    }
 }
 
 export async function DELETE(req: NextRequest, context: {params: FindById}) {
-    try{
+    try {
         const familia = await prisma.familia.delete({
             where: {
                 id: context.params.id
             }
         });
 
-        return new NextResponse(JSON.stringify(familia), {
-            status: 200,
-        });
-    }catch(e) {
-        return new NextResponse(JSON.stringify({error: e}), {
-            status: 500,
-        });
+        return new NextResponse(
+            JSON.stringify(familia), 
+            { status: 200 }
+        );
+    }
+
+    catch (e) {
+        return new NextResponse(
+            JSON.stringify({ error: e }), 
+            { status: 500 }
+        );
     }
 }

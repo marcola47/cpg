@@ -7,12 +7,12 @@ type FindById = {
 }
 
 export async function GET(req: NextRequest, context: {params: FindById}) {
-    try{
+    try {
         const membroFamilia = await prisma.familiaPessoa.findFirstOrThrow({
             where: {
                 AND: [
-                    {familiaId: context.params.idFamilia},
-                    {pessoaId: context.params.idPessoa}
+                    { familiaId: context.params.idFamilia },
+                    { pessoaId: context.params.idPessoa }
                 ]
             },
             include: {
@@ -21,22 +21,22 @@ export async function GET(req: NextRequest, context: {params: FindById}) {
             }
         });
 
-       
-
-        return new NextResponse(JSON.stringify(membroFamilia), {
-            status: 200,
-        });
+        return new NextResponse(
+            JSON.stringify(membroFamilia), 
+            { status: 200 });
         
-    }catch(e) {
-        return new NextResponse(JSON.stringify({error: e}), {
-            status: 500,
-        });
     }
-    
+
+    catch (e) {
+        return new NextResponse(
+            JSON.stringify({ error: e }), 
+            { status: 500 }
+        );
+    }   
 }
 
 export async function DELETE(req: NextRequest, context: {params: FindById}) {
-    try{
+    try {
         const membroFamilia = await prisma.familiaPessoa.delete({
             where: {
                 pessoaId_familiaId: {
@@ -46,12 +46,16 @@ export async function DELETE(req: NextRequest, context: {params: FindById}) {
             }
         });
 
-        return new NextResponse(JSON.stringify(membroFamilia), {
-            status: 200,
-        });
-    }catch(e){
-        return new NextResponse(JSON.stringify({error: e}), {
-            status: 500,
-        });
+        return new NextResponse(
+            JSON.stringify(membroFamilia), 
+            { status: 200 }
+        );
+    }
+
+    catch (e) {
+        return new NextResponse(
+            JSON.stringify({ error: e }), 
+            { status: 500 }
+        );
     }
 }

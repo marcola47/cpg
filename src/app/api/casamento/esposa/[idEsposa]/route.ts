@@ -14,18 +14,22 @@ export async function GET(req: NextRequest, context: { params: FindById }) {
         });
 
         if (!casamento) {
-            return new NextResponse(JSON.stringify({ error: "Casamentos não encontrado" }), {
-                status: 404,
-            });
+            return new NextResponse(
+                JSON.stringify({ error: "Casamentos não encontrado" }), 
+                { status: 404 }
+            );
         }
 
-        return new NextResponse(JSON.stringify(casamento), {
-            status: 200,
-        });
-    }catch(e){
-        return new NextResponse(JSON.stringify({error: e}), {
-            status: 500,
-        });
+        return new NextResponse(
+            JSON.stringify(casamento), 
+            { status: 200 }
+        );
     }
     
+    catch (e) {
+        return new NextResponse(
+            JSON.stringify({ error: e }), 
+            { status: 500 }
+        );
+    } 
 }

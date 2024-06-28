@@ -11,35 +11,37 @@ export async function GET(req: NextRequest, context: { params: FindById }) {
         const casamento = await prisma.casamento.findFirst({
             where: {
                 AND: [
-                    {
-                        esposoId: context.params.idEsposo
-                    },
-                    {
-                        esposaId: context.params.idEsposa
-                    }
+                    { esposoId: context.params.idEsposo },
+                    { esposaId: context.params.idEsposa }
                 ]
             }
         });
 
         if (!casamento) {
-            return new NextResponse(JSON.stringify({ error: "Casamento não encontrado" }), {
-                status: 404,
-            });
+            return new NextResponse(
+                JSON.stringify({ error: "Casamento não encontrado" }), 
+                { status: 404 }
+            );
         }
 
-        return new NextResponse(JSON.stringify(casamento), {
-            status: 200,
-        });
-    }catch(e){
-        return new NextResponse(JSON.stringify({error: e}), {
-            status: 500,
-        });
+        return new NextResponse(
+            JSON.stringify(casamento), 
+            { status: 200 }
+        );
+    }
+    
+    catch(e) {
+        return new NextResponse(
+            JSON.stringify({ error: e }), 
+            { status: 500 }
+        );
     }
 }
 
 export async function PUT(req: NextRequest, context: { params: FindById }) {
-    const data = await req.json();
     try {
+        const data = await req.json();
+        
         const casamento = await prisma.casamento.update({
             where: {
                 esposoId_esposaId: {
@@ -56,12 +58,14 @@ export async function PUT(req: NextRequest, context: { params: FindById }) {
         return new NextResponse(JSON.stringify(casamento), {
             status: 200,
         });
-    } catch (e) {
-        return new NextResponse(JSON.stringify({ error: e }), {
-            status: 500,
-        });
     }
-    
+
+    catch (e) {
+        return new NextResponse(
+            JSON.stringify({ error: e }), 
+            { status: 500 }
+        );
+    }
 }
 
 export async function DELETE(req: NextRequest, context: { params: FindById }) {
@@ -75,12 +79,16 @@ export async function DELETE(req: NextRequest, context: { params: FindById }) {
             }
         });
 
-        return new NextResponse(JSON.stringify(casamento), {
-            status: 200,
-        });
-    } catch (e) {
-        return new NextResponse(JSON.stringify({ error: e }), {
-            status: 500,
-        });
+        return new NextResponse(
+            JSON.stringify(casamento), 
+            { status: 200 }
+        );
+    } 
+    
+    catch (e) {
+        return new NextResponse(
+            JSON.stringify({ error: e }), 
+            { status: 500 }
+        );
     }
 }

@@ -1,4 +1,4 @@
-interface PessoaPrisma{
+interface PessoaPrisma {
     id: string;
     nome: string;
     genitorId: string | null;
