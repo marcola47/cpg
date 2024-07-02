@@ -5,8 +5,8 @@ async function addToFamily(pessoa: any) {
     const familias = await prisma.familiaPessoa.findMany({
         where: {
             OR: [
-                {pessoaId: pessoa.genitorId == null ? "1" : pessoa.genitorId},
-                {pessoaId: pessoa.genitoraId == null ? "1" : pessoa.genitoraId},
+                { pessoaId: pessoa.genitorId == null ? "1" : pessoa.genitorId },
+                { pessoaId: pessoa.genitoraId == null ? "1" : pessoa.genitoraId },
                 
             ]
         }
@@ -373,10 +373,6 @@ async function main() {
     console.log("Ricardao", ricardao.id);
     console.log("Ricardao Familia", familia5.id);
     console.log("Marcia", pessoa33);
-    
-   
-
-
 }
 
 main()

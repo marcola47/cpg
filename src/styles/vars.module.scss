@@ -19,56 +19,40 @@ $w10: 83.3333%;
 $w11: 91.6666%;
 $w12: 100%;
 
-$grey-dark: #333;
-$grey-mid: #454545;
-$grey-light: #666; 
+$orange-900: hsl(24, 100%, 45%);
+$orange-800: hsl(24, 100%, 50%);
+$orange-700: hsl(24, 100%, 60%);
+$orange-600: hsl(24, 100%, 65%);
+$orange-500: hsl(24, 100%, 70%);
+$orange-400: hsl(24, 100%, 70%);
+$orange-300: hsl(24, 100%, 75%);
+$orange-200: hsl(24, 100%, 80%);
+$orange-100: hsl(24, 100%, 85%);
+$orange-50: hsl(24, 100%, 94%);
+$orange-25: hsl(24, 100%, 98%);
 
-$blue-dark: #23496B;
-$blue-mid: #2a5d8a;
-$blue-light: #58748D;
+$grey-dark: hsl(0, 0%, 20%);
+$grey-mid: hsl(0, 0%, 40%);
+$grey-light: hsl(0, 0%, 60%); 
 
-$purple-dark: #633B9E;
-$purple-light: #843A9D;
+$blue-dark: hsl(208, 51%, 28%);
+$blue-mid: hsl(208, 53%, 35%);
+$blue-light: hsl(208, 23%, 45%);
 
-$orange-dark: #db521c;
-$orange-mid: #F26E3A;
-$orange-light: #FFA873;
+$yellow-dark: hsl(59, 84%, 36%);
+$yellow-mid: hsl(59, 87%, 54%);
+$yellow-light: hsl(59, 100%, 73%);
 
-$yellow-dark: darken(#a5a208, 20%);
-$yellow-mid: #f0ec21;
-$yellow-light: #fffd75;
+$red-dark: hsl(0, 66%, 38%);
+$red-mid: hsl(0, 77%, 43%);
+$red-light: hsl(0, 100%, 50%);
 
-$red-dark: #9F2121;
-$red-mid: #C11919;
-$red-light: #FF3D3D;
-
-$pink-dark: #DB3F79;
-$pink-light: #E45261;
-
-$lilac-light: #843a9d13;
-$lilac-dark: #74338821;
-
-$green-dark: #2E7D32;
-$green-light: #4CAF50;
+$green-dark: hsl(123, 50%, 35%);
+$green-mid: hsl(123, 50%, 50%);
+$green-light: hsl(123, 50%, 60%);
 
 .t--bold {
   font-weight: 600;
-}
-
-.t-hl--purple {
-  color: $purple-dark;
-}
-
-.t-hl--orange {
-  color: $orange-mid;
-}
-
-.t-hl--blue {
-  color: $blue-dark;
-}
-
-.t-hl--green {
-  color: $green-dark;
 }
 
 .loader {
@@ -168,15 +152,11 @@ $green-light: #4CAF50;
   
   &::-webkit-scrollbar-track {
     border-radius: $br-s;
-    // border-top-right-radius: $br-s;
-    // border-bottom-right-radius: $br-s;
     background: #d8d8d8;
   }
   
   &::-webkit-scrollbar-thumb {
     border-radius: $br-s;
-    // border-top-right-radius: $br-s;
-    // border-bottom-right-radius: $br-s;
     background: #a8a8a8;
   }
   

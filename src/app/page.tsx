@@ -1,9 +1,12 @@
+"use client"
+import Card, { CardAdd } from "@/app/components/Card"
 import "./style.scss"
 
-export default async function Page(): Promise<JSX.Element> {
+export default function Page(): JSX.Element {
     return (
         <div className="page home">
-            diklghjdfklçgdf
+            <Card/>
+            <CardAdd/>
         </div>
     )
 }

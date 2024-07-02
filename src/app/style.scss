@@ -1,1 +1,6 @@
 @use '@/styles/vars.module.scss' as *;
+
+.home {
+    display: grid;
+    place-items: center;
+}

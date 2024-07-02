@@ -1,0 +1,12 @@
+@use "@/styles/vars.module.scss" as *;
+
+.navbar {
+    display: flex;
+    align-items: center;
+
+    position: absolute;
+    width: 100%;
+    height: 56px;
+    padding-inline: 32px;
+    background-color: $orange-50;
+}

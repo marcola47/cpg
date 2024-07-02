@@ -1,0 +1,184 @@
+@use '@/styles/vars.module.scss' as *;
+
+$colors: (
+    "Black": $grey-dark,
+    "White" : #fff,
+    "Grey": $grey-light,
+    "Orange": $orange-800,
+    "Blue": $blue-mid,
+    "Green" : $green-mid,
+);
+
+.btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+
+    padding: 12px;
+    border: 2px solid #00000000;
+    border-radius: $br-m;
+
+    font-weight: 500;
+    cursor: pointer;
+    @include transition;
+
+    svg {
+        @include transition;
+    }
+
+    .text {
+        user-select: none;
+    }
+}
+
+.loading {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.fullWidth {
+    width: $w12;
+}
+
+@each $color-name, $color-value in $colors {
+    .color {
+        &#{ $color-name } {
+            color: $color-value;
+        }
+    }
+
+    .bg {
+        &#{ $color-name } {
+            background-color: $color-value;
+        }
+    }
+
+    .border {
+        &#{ $color-name } {
+            border-color: $color-value;
+        }
+    }
+
+    .icon {
+        &#{ $color-name } {
+            svg {
+                color: $color-value;
+            }
+        }
+    }
+}
+
+.trans {
+    &Grow {
+        &Small {
+            &:hover {
+                transform: scale(1.02);
+            }
+        
+            &:active {
+                transform: scale(1);
+            }
+        }
+          
+        &:hover {
+            transform: scale(1.05);
+        }
+    
+        &:active {
+            transform: scale(1);
+        }
+    }
+
+    @each $color-name, $color-value in $colors {
+        &Fill {
+            &#{ $color-name } {
+                &:hover {
+                    color: #fff;
+                    border-color: lighten($color-value, 10%);
+                    background-color: lighten($color-value, 10%);
+
+                    svg {
+                        color: #fff;
+                    }
+                }
+
+                &:active {
+                    color: #fff;
+                    border-color: $color-value;
+                    background-color: $color-value;
+
+                    svg {
+                        color: #fff;
+                    }
+                }
+            }
+        }
+
+        &Border {
+            &#{ $color-name } {
+                &:hover {
+                    border-color: lighten($color-value, 10%);
+                    color: lighten($color-value, 10%);
+
+                    svg {
+                        color: lighten($color-value, 10%);
+                    }
+                }
+    
+                &:active {
+                    border-color: $color-value;
+                    color: $color-value;
+
+                    svg {
+                        color: $color-value;
+                    }
+                }
+            }
+        }
+
+        &Bg {
+            &#{ $color-name } {
+                &:hover {
+                    color: #fff;
+                    border-color: lighten($color-value, 10%);
+                    background-color: lighten($color-value, 10%);
+
+                    svg {
+                        color: #fff;
+                    }
+                }
+
+                &:active {
+                    color: #fff;
+                    border-color: $color-value;
+                    background-color: $color-value;
+
+                    svg {
+                        color: #fff;
+                    }
+                }
+            }
+        }
+
+        &Color {
+            &#{ $color-name } {
+                &:hover {
+                    color: lighten($color-value, 10%);
+
+                    svg {
+                        color: lighten($color-value, 10%);
+                    }
+                }
+
+                &:active {
+                    color: $color-value;
+
+                    svg {
+                        color: $color-value;
+                    }
+                }
+            }
+        }
+    }
+}

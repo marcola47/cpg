@@ -10,7 +10,7 @@
 }
 
 html, input, button, textarea, select { 
-  font-family: var(--font-montserrat); 
+  font-family: var(--font-inter); 
 }
 
 a {
@@ -24,7 +24,7 @@ input[type=number]::-webkit-inner-spin-button {
 
 input[type=checkbox] {
   cursor: pointer;
-  accent-color: $purple-dark;
+  accent-color: $blue-dark;
 }
 
 button {
@@ -39,17 +39,14 @@ strong {
 }
 
 .app {
-  display: flex;
-  flex-direction: column;
-
   position: relative;
   min-height: 100dvh;
   background-color: #fff;
 }
 
 .page {
-  min-height: calc(100dvh - 128px); // full page - footer height
-  padding-block: 120px 64px;
+  min-height: 100dvh;
+  padding-block: 72px 32px;
 
   &--def-loading {    
     display: grid;
@@ -67,7 +64,7 @@ strong {
     .icon {
       margin-top: 48px;
       font-size: 8rem;
-      color: $orange-mid;
+      color: $red-mid;
     }
   }
 
@@ -84,7 +81,7 @@ strong {
     .icon {
       margin-bottom: 32px;
       font-size: 8rem;
-      color: $orange-mid;
+      color: $red-mid;
     }
   }
 
@@ -102,7 +99,7 @@ strong {
   }
 
   &__subtitle {
-    color: $orange-light;
+    color: $blue-light;
     font-weight: 500;
 
     &--left {

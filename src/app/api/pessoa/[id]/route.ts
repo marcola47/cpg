@@ -128,7 +128,7 @@ async function updateDescedents(descedentes: string[]) {
         where: {
             OR: [
                 { pessoaId: pessoa.genitorId ? pessoa.genitorId : '' },
-                { pessoaId: pessoa.genitoraId? pessoa.genitoraId : '' }
+                { pessoaId: pessoa.genitoraId ? pessoa.genitoraId : '' }
             ]
         }
     });
@@ -143,7 +143,6 @@ async function updateDescedents(descedentes: string[]) {
     }
 
     for (const d of descedentesPessoa) {
-        console.log(d.id);
         descedentes.push(d.id);
     }
 
