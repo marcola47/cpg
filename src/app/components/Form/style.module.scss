@@ -1,0 +1,72 @@
+@use "@/styles/vars.module.scss" as *;
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    position: relative;
+    padding: 48px;
+    border-radius: $br-m;
+
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.15);
+
+    .close {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 56px;
+        height: 56px;
+        padding: 16px;
+
+        cursor: pointer;
+        @include transition;
+
+        &:hover {
+            color: $orange-700;
+        }
+    }
+
+    .inputs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        
+        .input {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            
+            &Name, &Father, &Mother {
+                grid-column: 1;
+            }
+
+            &Birth, &Baptism, &Death {
+                grid-column: 2;
+            }
+
+            &Name, &Birth {
+                grid-row: 1;
+            }
+
+            &Father, &Baptism {
+                grid-row: 2;
+            }
+
+            &Mother, &Death {
+                grid-row: 3;
+            }
+
+            .fields {
+                display: flex;
+                gap: 8px;
+            }
+
+            .field {
+                padding: 8px;
+                border: 2px solid $grey-dark;
+                border-radius: $br-s;
+            }
+        }
+    }
+}

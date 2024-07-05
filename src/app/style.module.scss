@@ -1,0 +1,40 @@
+@use '@/styles/vars.module.scss' as *;
+
+.home {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+
+    width: $w11;
+    max-width: 1440px;
+    margin-inline: auto;
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        place-items: center;
+        gap: 24px;
+        
+        overflow-y: auto;
+        max-height: 80dvh;
+        padding-right: 4px;
+        @include scrollbar_medium;
+    }
+}
+
+@media screen and (max-width: 1200px) {
+    .home {
+        .grid {
+            grid-template-columns: 1fr 1fr;
+            place-items: center;
+        }
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .home {
+        .grid {
+            grid-template-columns: 1fr;
+        }
+    }
+}

@@ -53,153 +53,87 @@ $green-light: hsl(123, 50%, 60%);
 
 .t--bold {
   font-weight: 600;
+} 
+
+@mixin scrollbar() {
+    &::-webkit-scrollbar-track {
+        border-radius: $br-s;
+        background: $orange-50;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+        border-radius: $br-s;
+        background: $orange-300;
+        cursor: pointer;
+    }
+    
+    &::-webkit-scrollbar-thumb:hover {
+        background: $orange-200;
+    }
 }
 
-.loader {
-  display: block;
-  position: relative;
-  margin-inline: auto;
-
-  &::before, &::after {
-    content: "";  
-    position: absolute;
-    top: 0;
-    left: 0;
-    border-radius: 50%;
-    background-color: #fff;
-
-    transform: scale(0);
-    animation: anim-loader 2s linear infinite;
-  }
-
-  &::after {
-    animation-delay: 1s;
-  }
-
-  @keyframes anim-loader {
-    0% {
-      transform: scale(0);
-      opacity: 1;
-    }
-    100% {
-      transform: scale(1);
-      opacity: 0;
-    }
-  }
-
-  &--grey {
-    &::before, &::after {
-      background-color: $grey-light;
-    }
-  }
-
-  &--xs {
-    width: 20px;
-    height: 20px;
-
-    &::before, &::after {
-      width: 20px;
-      height: 20px;
-    }
-  }
-
-  &--s {
-    width: 32px;
-    height: 32px;
-
-    &::before, &::after {
-      width: 32px;
-      height: 32px;
-    }
-  }
-
-  &--m {
-    width: 64px;
-    height: 64px;
-
-    &::before, &::after {
-      width: 64px;
-      height: 64px;
-    }
-  }
-
-  &--l {
-    width: 128px;
-    height: 128px;
-
-    &::before, &::after {
-      width: 128px;
-      height: 128px;
-    }
-  }
-
-  &--xl {
-    width: 256px;
-    height: 256px;
-
-    &::before, &::after {
-      width: 256px;
-      height: 256px;
-    }
-  }
-}      
-
 @mixin scrollbar_small() {
-  &::-webkit-scrollbar {
-    width: 8px;
-    @include transition;
-  }
-  
-  &::-webkit-scrollbar-track {
-    border-radius: $br-s;
-    background: #d8d8d8;
-  }
-  
-  &::-webkit-scrollbar-thumb {
-    border-radius: $br-s;
-    background: #a8a8a8;
-  }
-  
-  &::-webkit-scrollbar-thumb:hover {
-    background: #b3b3b3;
-  }
+    @include scrollbar;
+    
+    &::-webkit-scrollbar {
+        width: 8px;
+        @include transition;
+    }
+}
+
+@mixin scrollbar_medium() {
+    @include scrollbar;
+    
+    &::-webkit-scrollbar {
+        width: 12px;
+        @include transition;
+    }
+}
+
+@mixin scrollbar_large() {
+    @include scrollbar;
+    
+    &::-webkit-scrollbar {
+        width: 16px;
+        @include transition;
+    }
 }
 
 @mixin transition { 
-  transition: all 0.1s ease-in-out;
+    transition: all 0.1s ease-in-out;
 }
 
 @keyframes fade-in {
-  from { opacity: 0 }
-  to   { opacity: 1 }
+    from { opacity: 0 }
+    to   { opacity: 1 }
 }
 
 @keyframes loading {
-  0%   { background-color: hsl(200, 0%, 93%) }
-  100% { background-color: hsl(200, 0%, 98%) }
+    0%   { background-color: hsl(200, 0%, 93%) }
+    100% { background-color: hsl(200, 0%, 98%) }
 }
 
 @keyframes pulsing {
-  0%   { opacity: 1; }
-  100% { opacity: 0.5; }
+    0%   { opacity: 1; }
+    100% { opacity: 0.5; }
 }
 
 @mixin anim--fade-in--short {
-  animation: fade-in 0.15s ease-in-out forwards;
+    animation: fade-in 0.15s ease-in-out forwards;
 }
 
 @mixin anim--fade-in--mid {
-  animation: fade-in 0.5s ease-in-out forwards;
+    animation: fade-in 0.5s ease-in-out forwards;
 }
 
 @mixin anim--fade-in--long {
-  animation: fade-in 1s ease-in-out forwards;
+    animation: fade-in 1s ease-in-out forwards;
 }
 
 @mixin anim--loading {
-  animation: loading 1s linear infinite alternate;
+    animation: loading 1s linear infinite alternate;
 }
 
 @mixin anim--pulsing {
-  animation: pulsing 3s linear infinite alternate;
+    animation: pulsing 3s linear infinite alternate;
 }

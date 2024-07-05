@@ -1,0 +1,8 @@
+@use "@/styles/vars.module.scss" as *;
+
+.page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}

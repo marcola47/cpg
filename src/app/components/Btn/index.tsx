@@ -1,6 +1,8 @@
 "use client"
 import Link from "next/link";
+
 import clsx from "clsx";
+import app from "@/styles/app.module.scss";
 import s from "./style.module.scss";
 
 type colors = "black" | "white" | "grey" | "orange" | "blue" | "red" | "green";
@@ -32,7 +34,7 @@ type BtnProps =
     | (CommonBtnProps & { 
         link?: false,
         href?: undefined,
-        onClick: () => any,
+        onClick: (e?: any) => any,
     });
 
 export function Btn(props: BtnProps): JSX.Element {
@@ -93,7 +95,9 @@ export function Btn(props: BtnProps): JSX.Element {
             <Link
                 className={ className }
                 href={ href }
-            > { text }
+            > 
+                { icon && icon }
+                { text }
             </Link>
         )
     }
@@ -105,7 +109,7 @@ export function Btn(props: BtnProps): JSX.Element {
         >   
             {
                 loading 
-                ?   <span className="loader loader--xs"/>
+                ?   <span className={ clsx(app.loader, app.loaderGrey, app.loaderXs) }/>
                 :   <>
                         { icon && icon }
                         <span className={ clsx(s.text) }>

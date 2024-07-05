@@ -42,6 +42,17 @@
             font-size: 3.5rem;
             color: $grey-mid;
         }
+
+        .input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid $orange-300;
+            border-radius: $br-s;
+        }
+
+        .btns {
+            width: 100%;
+        }
     }
 
     .family {
@@ -65,5 +76,16 @@
     .btns {
         display: flex;
         gap: 8px;
+    }
+}
+
+@media screen and (max-width: 456px) {
+    .card {
+        height: fit-content;
+        min-height: 192px;
+
+        .btns {
+            flex-direction: column;
+        }
     }
 }

@@ -1,0 +1,22 @@
+@use "@/styles/vars.module.scss" as *;
+
+.searchbar {
+    position: relative;
+    width: $w12;
+    margin-inline: auto;
+    border: 2px solid $grey-mid;
+    border-radius: $br-m;
+
+    .icon {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        color: $orange-800;
+    }
+
+    .input {
+        width: $w12;
+        padding: 12px 40px;
+        border-radius: $br-m;
+    }
+}

@@ -11,24 +11,54 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-    
     try {
-        const data: Pessoa = await req.json();
-        const pessoa = await prisma.pessoa.create({ data })
+        const data = await req.json();
 
-        if (data.genitorId || data.genitoraId) {
-            const familias = await prisma.familiaPessoa.findMany({
+        if (!data)
+            throw new Error("")
+        
+        const pessoa = await prisma.pessoa.create({ 
+            data 
+        })
+
+        if (!data.genitorId) {
+            const familia = await prisma.familia.findUnique({
                 where: {
-                    OR:[
-                        { pessoaId: data.genitorId },
-                        { pessoaId: data.genitoraId }
-                    ]
+                    id: data.genitorFamilia
                 }
-            });
+            })
+
+            if (!familia)
+                throw new Error("Não foi possível encontrar a familia do genitor")
+
+            await prisma.familiaPessoa.create({
+                data: {
+                    pessoaId: pessoa.id,
+                    familiaId: familia.id,
+                }
+            })
+        }
+
+        if (!data.genitoraId) {
+            const familia = await prisma.familia.findUnique({
+                where: {
+                    id: data.genitoraFamilia
+                }
+            })
+
+            if (!familia)
+                throw new Error("Não foi possível encontrar a familia da genitora")
+
+            await prisma.familiaPessoa.create({
+                data: {
+                    pessoaId: pessoa.id,
+                    familiaId: familia.id
+                }
+            })
         }
 
         if (data.idEsposa) {
-            const casamento = await prisma.casamento.create({
+            await prisma.casamento.create({
                 data: {
                     esposaId: data.idEsposa,
                     esposoId: pessoa.id,
@@ -39,7 +69,7 @@ export async function POST(req: NextRequest) {
         }
         
         else if (data.idEsposo) {
-            const casamento = await prisma.casamento.create({
+            await prisma.casamento.create({
                 data: {
                     esposaId: pessoa.id,
                     esposoId: data.idEsposo,
@@ -48,7 +78,7 @@ export async function POST(req: NextRequest) {
                 }
             });
         }
-
+        
         return new NextResponse(
             JSON.stringify(pessoa), 
             { status: 201 }

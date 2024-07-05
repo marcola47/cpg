@@ -1,0 +1,176 @@
+@use '@/styles/vars.module.scss' as *;
+
+.app {
+  position: relative;
+  min-height: 100dvh;
+  background-color: #fff;
+}
+
+.page {
+  min-height: 100dvh;
+  padding-block: 72px 32px;
+
+  &DefLoading {    
+    display: grid;
+    place-items: center;
+  }
+
+  &NotFound {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    height: 80dvh;
+    padding: 192px 24px 24px 24px;
+    text-align: center;
+
+    .icon {
+      margin-top: 48px;
+      font-size: 8rem;
+      color: $orange-700;
+    }
+  }
+
+  &Error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  
+    width: $w9;
+    max-width: 800px;
+    margin-inline: auto;
+
+    .icon {
+      margin-bottom: 32px;
+      font-size: 8rem;
+      color: $orange-700;
+    }
+  }
+
+  .title {
+    color: $blue-dark;
+    text-align: center;
+
+    &Left {
+      text-align: left;
+    }
+
+    &Right {
+      text-align: right;
+    }
+  }
+
+  .subtitle {
+    color: $blue-light;
+    font-weight: 500;
+
+    &Left {
+      text-align: left;
+    }
+
+    &Right {
+      text-align: right;
+    }
+  }
+}
+
+.error {
+  &Message {
+    width: 100%;
+    padding: 16px;
+    border-radius: $br-m;
+    
+    color: hsl(0, 100%, 60%);
+    background-color: hsl(0, 100%, 90%);
+  }
+}
+
+.loader {
+    display: block;
+    position: relative;
+    margin-inline: auto;
+  
+    &::before, &::after {
+      content: "";  
+      position: absolute;
+      top: 0;
+      left: 0;
+      border-radius: 50%;
+      background-color: #fff;
+  
+      transform: scale(0);
+      animation: anim-loader 2s linear infinite;
+    }
+  
+    &::after {
+      animation-delay: 1s;
+    }
+  
+    @keyframes anim-loader {
+      0% {
+        transform: scale(0);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 0;
+      }
+    }
+  
+    &Grey {
+      &::before, &::after {
+        background-color: $grey-light;
+      }
+    }
+  
+    &Xs {
+      width: 20px;
+      height: 20px;
+  
+      &::before, &::after {
+        width: 20px;
+        height: 20px;
+      }
+    }
+  
+    &S {
+      width: 32px;
+      height: 32px;
+  
+      &::before, &::after {
+        width: 32px;
+        height: 32px;
+      }
+    }
+  
+    &M {
+      width: 64px;
+      height: 64px;
+  
+      &::before, &::after {
+        width: 64px;
+        height: 64px;
+      }
+    }
+  
+    &L {
+      width: 128px;
+      height: 128px;
+  
+      &::before, &::after {
+        width: 128px;
+        height: 128px;
+      }
+    }
+  
+    &Xl {
+      width: 256px;
+      height: 256px;
+  
+      &::before, &::after {
+        width: 256px;
+        height: 256px;
+      }
+    }
+  }     

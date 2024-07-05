@@ -6,120 +6,10 @@ type FindById = {
     id: string;
 };
 
-async function getDescendants(nivel: string,descendants: string[], family: { [key: string]: { [key: string] : any } }) {
-    const id: string | undefined = descendants.shift();
+export async function POST(req: NextRequest, context: { params: FindById }) {
+    const { cpfOrdenador, nomeOrdenador, userId } = await req.json();
+    console.log(cpfOrdenador, nomeOrdenador, userId)
     
-    if (!id) 
-        return;
-    
-    const pessoa = await prisma.pessoa.findUnique({
-        where: {
-            id: id
-        }
-    });
-
-    if (!pessoa)
-        return;
-
-    const filhos = await prisma.pessoa.findMany({
-        where: {
-            OR: [
-                { genitorId: id },
-                { genitoraId: id }
-            ]
-        },
-        orderBy: {
-            dataNascimento: 'asc'
-        },
-    });
-
-    const conjuges = await prisma.casamento.findMany({
-        where: {
-            OR: [
-                { esposoId: id },
-                { esposaId: id }
-            ]
-        }, 
-        orderBy: {
-            dataCasamento: 'asc'
-        }, 
-        include: {
-            esposo: true,
-            esposa: true
-        }
-    });
-    
-    family[id] = {
-        filhos: [],
-        conjuges: [],
-        info: {},
-        nivel: nivel
-    }
-
-    family[id].info = {
-        nome: pessoa.nome,
-        genitorId: pessoa.genitorId,
-        genitoraId: pessoa.genitoraId,
-        dataNascimento: pessoa.dataNascimento,
-        localNascimento: pessoa.localNascimento,
-        dataFalecimento: pessoa.dataFalecimento,
-        localFalecimento: pessoa.localFalecimento,
-        localBatismo: pessoa.localBatismo,
-        dataBatismo: pessoa.dataBatismo,
-        observacoes: pessoa.observacoes
-    }
-
-    for(let c of conjuges) {
-        const idConjuge = c.esposoId === id ? c.esposaId : c.esposoId;
-        const paisDoConjuge = await prisma.pessoa.findUnique({
-            where: {
-                id: idConjuge
-            },
-            select: {
-                genitor: true,
-                genitora: true,
-            }
-        });
-
-        let copyConjuge = {
-            conjuge: c.esposoId === idConjuge ? c.esposo : c.esposa,
-            dataCasamento: c.dataCasamento,
-            localCasamento: c.localCasamento,
-            genitor: paisDoConjuge?.genitor?.nome,
-            genitora: paisDoConjuge?.genitora?.nome
-        }
-        
-
-        family[id].conjuges.push(
-            copyConjuge
-        );
-    }
-
-    let numFilhos = 0;
-
-    for (let f of filhos) {
-        family[id].filhos.push({
-            id: f.id,
-            genitorId: f.genitorId,
-            genitoraId: f.genitoraId,
-        });
-
-        descendants.push(f.id);
-        numFilhos++;
-        const nivelFilho = nivel + '.' + numFilhos;
-        await getDescendants(nivelFilho,descendants, family);
-    }
-    
-}
-
-function parseDate(date: Date | null | undefined): string {
-    if (!date)
-        return 'Desconhecido';
-    
-    return date.toISOString().split('T')[0].replace(/-/g, '/');
-}
-
-export async function GET(req: NextRequest, context: { params: FindById }) {
     try {
         const familia = await prisma.familia.findFirst({
             where: {
@@ -166,7 +56,7 @@ export async function GET(req: NextRequest, context: { params: FindById }) {
 
             stringFamily += "\t".repeat(nivel.split('.').length);
             stringFamily += `${nivel} ${info.nome} nasc. ${info.dataNascimento ? parseDate(info.dataNascimento) : 'Desconhecido'} `;
-            stringFamily += `em ${info.localNascimento ? info.localNascimento : 'Desconhecido'}.`;
+            stringFamily += `em ${info.localNascimento ? info.localNascimento : 'Desconhecido'}. `;
             let multipleCasamentos = false;
 
             if (conjuges.length > 0) {
@@ -175,7 +65,7 @@ export async function GET(req: NextRequest, context: { params: FindById }) {
                 for (const c of conjuges) {
                     stringFamily += `${multipleCasamentos ? 'Também, casou com' : ''} `;
                     stringFamily += `${c.conjuge.nome} ${c.dataCasamento ? "em " + parseDate(c.dataCasamento) : ''} `;
-                    stringFamily += `descendente de ${c.genitor ? c.genitor : 'Desconhecido'} e ${c.genitora ? c.genitora : 'Desconhecido'} `;
+                    stringFamily += `descendente de ${c.genitor ? c.genitor : 'Desconhecido'} e ${c.genitora ? c.genitora : 'Desconhecido'}`;
                     stringFamily += `${c.conjuge.dataNascimento ? ", nasc." + parseDate(c.conjuge.dataNascimento) : ''} `;
                     stringFamily += `${c.conjuge.localNascimento ? "em " + c.conjuge.localNascimento : ''} `;
                     stringFamily += `${c.conjuge.dataFalecimento ? c.conjuge.nome + "faleceu em" + parseDate(c.conjuge.dataFalecimento) : ''}.`;
@@ -207,8 +97,18 @@ export async function GET(req: NextRequest, context: { params: FindById }) {
             stringFamily += '\n';            
         }   
 
+        const relatorio = await prisma.relatorio.create({
+            data: {
+                cpfOrdenador,
+                nomeOrdenador,
+                observacoes: stringFamily,
+                idFamilia: context.params.id,
+                userId,
+            }
+        })
+
         return new NextResponse(
-            stringFamily, 
+            JSON.stringify(relatorio), 
             { status: 200 }
         );
 
@@ -219,5 +119,118 @@ export async function GET(req: NextRequest, context: { params: FindById }) {
             JSON.stringify({ error: e }), 
             { status: 500 }
         );
+    }
+
+    async function getDescendants(nivel: string, descendants: string[], family: { [key: string]: { [key: string] : any } }) {
+        const id: string | undefined = descendants.shift();
+        
+        if (!id) 
+            return;
+        
+        const pessoa = await prisma.pessoa.findUnique({
+            where: {
+                id: id
+            }
+        });
+    
+        if (!pessoa)
+            return;
+    
+        const filhos = await prisma.pessoa.findMany({
+            where: {
+                OR: [
+                    { genitorId: id },
+                    { genitoraId: id }
+                ]
+            },
+            orderBy: {
+                dataNascimento: 'asc'
+            },
+        });
+    
+        const conjuges = await prisma.casamento.findMany({
+            where: {
+                OR: [
+                    { esposoId: id },
+                    { esposaId: id }
+                ]
+            }, 
+            orderBy: {
+                dataCasamento: 'asc'
+            }, 
+            include: {
+                esposo: true,
+                esposa: true
+            }
+        });
+        
+        family[id] = {
+            filhos: [],
+            conjuges: [],
+            info: {},
+            nivel: nivel
+        }
+    
+        family[id].info = {
+            nome: pessoa.nome,
+            genitorId: pessoa.genitorId,
+            genitoraId: pessoa.genitoraId,
+            dataNascimento: pessoa.dataNascimento,
+            localNascimento: pessoa.localNascimento,
+            dataFalecimento: pessoa.dataFalecimento,
+            localFalecimento: pessoa.localFalecimento,
+            localBatismo: pessoa.localBatismo,
+            dataBatismo: pessoa.dataBatismo,
+            observacoes: pessoa.observacoes
+        }
+    
+        for(let c of conjuges) {
+            const idConjuge = c.esposoId === id ? c.esposaId : c.esposoId;
+            const paisDoConjuge = await prisma.pessoa.findUnique({
+                where: {
+                    id: idConjuge
+                },
+                select: {
+                    genitor: true,
+                    genitora: true,
+                }
+            });
+    
+            let copyConjuge = {
+                conjuge: c.esposoId === idConjuge ? c.esposo : c.esposa,
+                dataCasamento: c.dataCasamento,
+                localCasamento: c.localCasamento,
+                genitor: paisDoConjuge?.genitor?.nome,
+                genitora: paisDoConjuge?.genitora?.nome
+            }
+            
+    
+            family[id].conjuges.push(
+                copyConjuge
+            );
+        }
+    
+        let numFilhos = 0;
+    
+        for (let f of filhos) {
+            family[id].filhos.push({
+                id: f.id,
+                genitorId: f.genitorId,
+                genitoraId: f.genitoraId,
+            });
+    
+            descendants.push(f.id);
+            numFilhos++;
+            const nivelFilho = nivel + '.' + numFilhos;
+            await getDescendants(nivelFilho,descendants, family);
+        }
+        
+    }
+    
+    function parseDate(date: Date | null | undefined): string {
+        if (!date)
+            return 'Desconhecido';
+        
+        return date.toISOString().split('T')[0].replace(/-/g, '/');
     }
 }

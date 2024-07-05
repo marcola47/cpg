@@ -22,10 +22,11 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
     try {
         const { nome } = await req.json();
+        const trimmedName = nome.trim();
 
         const familia = await prisma.familia.create({
             data: {
-                nome,
+                nome: trimmedName
             },
         });
 
@@ -35,10 +36,14 @@ export async function POST(req: NextRequest) {
         );
     } 
     
-    catch (e) {
+    catch (e: any) {
+        const status = e.code === "P2002"
+        ? 409
+        : 500
+
         return new NextResponse(
             JSON.stringify({ error: e }), 
-            { status: 500 }
+            { status: status }
         );
     }
 }

@@ -8,7 +8,9 @@ import { Toaster } from "sonner";
 import SessionProvider from "@/app/contexts/Session";
 import Navbar from "./components/Navbar/indext";
 
-import "@/styles/app.scss";
+import clsx from "clsx";
+import "@/styles/globals.scss";
+import app from "@/styles/app.module.scss";
 
 export const metadata: Metadata = {
     title: "Create Next App",
@@ -29,7 +31,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             lang="en"
             className={ inter.className }
         >
-            <body className="app">
+            <body className={ clsx(app.app) }>
                 <SessionProvider session={ session }>
                     <Navbar/>
                     

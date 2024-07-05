@@ -1,0 +1,45 @@
+@use '@/styles/vars.module.scss' as *;
+
+* { 
+  margin: 0; 
+  padding: 0; 
+  outline: 0;
+  border: 0; 
+  box-sizing: border-box; 
+  scroll-behavior: smooth; 
+}
+
+html, input, button, textarea, select { 
+  font-family: var(--font-inter); 
+}
+
+a {
+  text-decoration: none;
+  color: #000;
+}
+
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+input[type=checkbox] {
+  cursor: pointer;
+  accent-color: $blue-dark;
+}
+
+button {
+  background-color: transparent;
+  font-size: inherit;
+  cursor: pointer;
+}
+
+
+strong {
+  font-weight: 600;
+}
+
+@media screen and (max-width: 480px) {
+  html {
+    font-size: 0.9rem;
+  }
+}

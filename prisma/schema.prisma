@@ -1,83 +1,95 @@
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
 
 model Familia {
-  id        String          @id @default(uuid())
-  nome      String
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
-  membros   FamiliaPessoa[]
-  Relatorio Relatorio[]
+    id        String          @id @default(uuid())
+    nome      String          @unique
+    
+    createdAt DateTime        @default(now())
+    updatedAt DateTime        @updatedAt
+
+    membros   FamiliaPessoa[]
+    genitores Pessoa[] @relation("GenitorFamilia")
+    genitoras Pessoa[] @relation("GenitoraFamilia")
+    Relatorio Relatorio[]
 }
 
 model FamiliaPessoa {
-  pessoaId  String
-  familiaId String
-  familia   Familia @relation(fields: [familiaId], references: [id], onDelete: Cascade)
-  pessoa    Pessoa  @relation(fields: [pessoaId], references: [id], onDelete: Cascade)
+    pessoaId  String
+    familiaId String
+    familia   Familia @relation(fields: [familiaId], references: [id], onDelete: Cascade)
+    pessoa    Pessoa  @relation(fields: [pessoaId], references: [id], onDelete: Cascade)
 
-  @@id([pessoaId, familiaId])
+    @@id([pessoaId, familiaId])
 }
 
 model Pessoa {
-  id               String          @id @default(uuid())
-  nome             String
-  genitorId        String?
-  genitoraId       String?
-  dataNascimento   DateTime?
-  localNascimento  String?
-  dataBatismo      DateTime?
-  localBatismo     String?
-  dataFalecimento  DateTime?
-  localFalecimento String?
-  observacoes      Json?
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
-  esposa           Casamento[]     @relation("esposa")
-  esposo           Casamento[]     @relation("esposo")
-  familias         FamiliaPessoa[]
-  genitor          Pessoa?         @relation("GenitorFilho", fields: [genitorId], references: [id])
-  filhode          Pessoa[]        @relation("GenitorFilho")
-  genitora         Pessoa?         @relation("GenitoraFilho", fields: [genitoraId], references: [id])
-  filhoda          Pessoa[]        @relation("GenitoraFilho")
+    id               String          @id @default(uuid())
+    nome             String
+    genitorId        String?
+    genitorFamilia   String?
+    genitoraId       String?
+    genitoraFamilia  String?
+    
+    dataNascimento   DateTime?
+    localNascimento  String?
+    dataBatismo      DateTime?
+    localBatismo     String?
+    dataFalecimento  DateTime?
+    localFalecimento String?
+    
+    observacoes      Json?
+    createdAt        DateTime        @default(now())
+    updatedAt        DateTime        @updatedAt
+    
+    esposa           Casamento[]     @relation("esposa")
+    esposo           Casamento[]     @relation("esposo")
+    familias         FamiliaPessoa[]
+    
+    genitor          Pessoa?         @relation("GenitorFilho", fields: [genitorId], references: [id])
+    familiaGenitor   Familia?        @relation("GenitorFamilia", fields: [genitorFamilia], references: [id])
+    filhode          Pessoa[]        @relation("GenitorFilho")
+    genitora         Pessoa?         @relation("GenitoraFilho", fields: [genitoraId], references: [id])
+    familiaGenitora  Familia?        @relation("GenitoraFamilia", fields: [genitoraFamilia], references: [id])
+    filhoda          Pessoa[]        @relation("GenitoraFilho")
 }
 
 model Casamento {
-  esposoId       String
-  esposaId       String
-  dataCasamento  DateTime?
-  localCasamento String?
-  esposa         Pessoa    @relation("esposa", fields: [esposaId], references: [id])
-  esposo         Pessoa    @relation("esposo", fields: [esposoId], references: [id])
+    esposoId       String
+    esposaId       String
+    dataCasamento  DateTime?
+    localCasamento String?
+    esposa         Pessoa    @relation("esposa", fields: [esposaId], references: [id])
+    esposo         Pessoa    @relation("esposo", fields: [esposoId], references: [id])
 
-  @@id([esposoId, esposaId])
+    @@id([esposoId, esposaId])
 }
 
 model User {
-  id        String      @id @default(uuid())
-  email     String      @unique
-  password  String
-  nome      String
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  Relatorio Relatorio[]
+    id        String      @id @default(uuid())
+    email     String      @unique
+    password  String
+    nome      String
+    createdAt DateTime    @default(now())
+    updatedAt DateTime    @updatedAt
+    Relatorio Relatorio[]
 }
 
 model Relatorio {
-  id            String   @id @default(uuid())
-  cpfOrdenador  String
-  nomeOrdenador String
-  observacoes   String?
-  idFamilia     String
-  userId        String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  familia       Familia  @relation(fields: [idFamilia], references: [id])
-  user          User     @relation(fields: [userId], references: [id])
+    id            String   @id @default(uuid())
+    cpfOrdenador  String
+    nomeOrdenador String
+    observacoes   String?
+    idFamilia     String
+    userId        String
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+    familia       Familia  @relation(fields: [idFamilia], references: [id])
+    user          User     @relation(fields: [userId], references: [id])
 }

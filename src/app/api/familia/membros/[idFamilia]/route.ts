@@ -5,7 +5,7 @@ type FindByIdFamilia = {
     idFamilia: string;
 }
 
-export async function GET(req: NextRequest, context: {params: FindByIdFamilia}) {
+export async function GET(req: NextRequest, context: { params: FindByIdFamilia }) {
     try {
         const pessoas = await prisma.familiaPessoa.findMany({
             where: {
@@ -35,7 +35,7 @@ export async function GET(req: NextRequest, context: {params: FindByIdFamilia}) 
     }
 }
 
-export async function POST(req: NextRequest, context: {params: FindByIdFamilia}) {
+export async function POST(req: NextRequest, context: { params: FindByIdFamilia }) {
     try {
         const { idPessoa } = await req.json();
 
