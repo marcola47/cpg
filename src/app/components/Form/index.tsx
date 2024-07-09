@@ -2,9 +2,13 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
-import { FaArrowLeft } from "react-icons/fa";
+import { toast } from "sonner";
+import { FaArrowLeft, FaMinus, FaMagnifyingGlass } from "react-icons/fa6";
 import PageError from "@/app/error";
 import PageLoading from "@/app/loading";
+import { Btn } from "@/app/components/Btn";
+
+import { formatDate } from "@/lib/input-functions";
 
 import clsx from "clsx";
 import s from "./style.module.scss";
@@ -19,40 +23,42 @@ export default function Form(props: FormProps): JSX.Element {
     const { type, location, person } = props;
     const router = useRouter();
 
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<any>("");
-
+    
+    const [fatherListShown, setFatherListShown] = useState<boolean>(false);
     const [fatherRefType, setFatherRefType] = useState<"id" | "family">("id")
     const [fatherFilter, setFatherFilter] = useState<string>("")
     const [fatherPeople, setFatherPeople] = useState<Person[]>([])
     const [fatherFamilies, setFatherFamilies] = useState<Family[]>([])
-
+    
+    const [motherListShown, setMotherListShown] = useState<boolean>(false);
     const [motherRefType, setMotherRefType] = useState<"id" | "family">("id")
     const [motherFilter, setMotherFilter] = useState<string>("")
     const [motherPeople, setMotherPeople] = useState<Person[]>([])
     const [motherFamilies, setMotherFamilies] = useState<Family[]>([])
     
-    const [partnerFilter, setParterFilter] = useState<string>("");
-    const [partnerPeople, setPartnerPeople] = useState<Person[]>([])
+    const [partnersListShown, setPartnersListShown] = useState<boolean>(false);
+    const [partnersFilter, setPartnersFilter] = useState<string>("");
+    const [partnersPeople, setPartnersPeople] = useState<Person[]>([])
     
-    const [listFatherShown, setListFatherShown] = useState<boolean>(false);
-    const [listMotherShown, setListMotherShown] = useState<boolean>(false);
-
     const [people, setPeople] = useState<Person[]>([])
     const [families, setFamilies] = useState<Person[]>([])
-
+    
     const [name, setName] = useState<string>(person?.nome || "")
     const [fatherId, setFatherId] = useState<string>(person?.genitorId || "");
     const [fatherFamily, setFatherFamily] = useState<string>(person?.genitorFamilia || "");
     const [motherId, setMotherId] = useState<string>(person?.genitorId || "");
     const [motherFamily, setMotherFamily] = useState<string>(person?.genitorFamilia || "");
-
+    
     const [birthDate, setBirthDate] = useState<string>("");
     const [birthPlace, setBirthPlace] = useState<string>("");
     const [baptismDate, setBaptismDate] = useState<string>("");
     const [baptismPlace, setBaptismPlace] = useState<string>("");
     const [deathDate, setDeathDate] = useState<string>("");
     const [deathPlace, setDeathPlace] = useState<string>("");
+    
+    const [partners, setPartners] = useState<Person[]>(person?.esposo || person?.esposa || []);
 
     // POG: Programação Orientada a Gambiarra
     useEffect(() => {
@@ -78,25 +84,43 @@ export default function Form(props: FormProps): JSX.Element {
     }, [families])
 
     useEffect(() => {
-        setFatherPeople(people.filter(p => p.nome.includes(fatherFilter)))
-    }, [people, fatherFilter])
+        setFatherPeople(people.filter(p => {
+            const isValidFather = !partners.map(pp => pp.id).includes(p.id) 
+                && motherId !== p.id
+                && p.nome.toLowerCase().includes(fatherFilter.toLowerCase())
 
-    useEffect(() => {
-        setMotherPeople(people.filter(p => p.nome.includes(motherFilter)))
-    }, [people, motherFilter])
+            if (isValidFather)
+                return p;
+        }))
+        
+        setMotherPeople(people.filter(p => {
+            const isValidMother = !partners.map(pp => pp.id).includes(p.id) 
+                && fatherId !== p.id
+                && p.nome.toLowerCase().includes(motherFilter.toLowerCase())
 
-    useEffect(() => {
-        setPartnerPeople(people.filter(p => p.nome.includes(partnerFilter)))
-    }, [people, partnerFilter])
+            if (isValidMother)
+                return p;
+        }))
+        
+        setPartnersPeople(people.filter(p => {
+            const isValidPartner = !partners.map(pp => pp.id).includes(p.id)
+                && fatherId !== p.id
+                && motherId !== p.id 
+                && p.nome.toLowerCase().includes(partnersFilter.toLowerCase()) 
 
+            if (isValidPartner)
+                return p;
+        }))
+    }, [people, fatherFilter, motherFilter, partnersFilter, partners])
+    
     useEffect(() => {
-        setFatherFamilies(families.filter(f => f.nome.includes(fatherFamily)))
+        setFatherFamilies(families.filter(f => f.nome.toLowerCase().includes(fatherFamily.toLowerCase())))
     }, [families, fatherFamily])
-
+    
     useEffect(() => {
-        setMotherFamilies(families.filter(f => f.nome.includes(motherFamily)))
+        setMotherFamilies(families.filter(f => f.nome.toLowerCase().includes(motherFamily.toLowerCase())))
     }, [families, motherFamily])
-
+    
     
     if (error) {
         return (
@@ -144,6 +168,8 @@ export default function Form(props: FormProps): JSX.Element {
                         placeholder="Apenas o nome sem sobrenome"
                         value={ name }
                         onChange={ e => setName(e.currentTarget.value) }
+                        autoComplete="off"
+                        required
                     />
                 </div>
 
@@ -152,13 +178,13 @@ export default function Form(props: FormProps): JSX.Element {
                         <button
                             className={ clsx( s.btn, fatherRefType === "id" && s.btnSelected ) }
                             onClick={ () => setFatherRefType("id") }
-                        > Genitor
+                        > GENITOR
                         </button> 
 
                         <button
                             className={ clsx( s.btn, fatherRefType === "family" && s.btnSelected ) }
                             onClick={ () => setFatherRefType("family") }
-                        > Familia
+                        > FAMILIA DO GENITOR
                         </button> 
                     </div>  
 
@@ -173,19 +199,53 @@ export default function Form(props: FormProps): JSX.Element {
                             : e => setFatherFamily(e.currentTarget.value)
                         }
                         onFocus={ () => {
-                            setListMotherShown(true)
-                            setListFatherShown(false)
+                            setFatherListShown(true)
+                            setMotherListShown(false)
+                            setPartnersListShown(false)
                         } }
-                        onBlur={ () => setListMotherShown(false) }
+                        onBlur={ () => setFatherListShown(false) }
+                        autoComplete="off"
                     />
 
                     {
-                        listFatherShown &&
-                        <List
-                            data={ fatherRefType === "id" ? fatherPeople : fatherFamilies }
-                            setState={ fatherRefType === "id" ? setFatherId : setFatherFamily }
-                            type={ fatherRefType === "id" ? "id" : "nome" }
-                        />
+                        fatherListShown && fatherRefType === "id" &&
+                        <ul className={ s.list }>
+                            {
+                                fatherPeople.map(item => (
+                                    <li 
+                                        className={ s.item }
+                                        key={ item.id }
+                                        onMouseDown={ () => {
+                                            setFatherId(item.id);
+                                            setFatherFilter(item.nome)
+                                        } }
+                                    > 
+                                        {
+                                            item.dataNascimento &&
+                                            <span>{ new Date(item.dataNascimento).getFullYear() }</span>
+                                        }
+            
+                                        <span>{ item.nome }</span>
+                                    </li>
+                                ))
+                            }
+                        </ul>
+                    }
+
+                    {
+                        fatherListShown && fatherRefType === "family" &&
+                        <ul className={ s.list }>
+                            {
+                                fatherFamilies.map(item => (
+                                    <li 
+                                        className={ s.item }
+                                        key={ item.id }
+                                        onMouseDown={ () => setFatherFamily(item.nome) }
+                                    > { item.nome }
+                                    </li>
+                                ))
+                            }
+                        </ul>
                     }
                 </div>
 
@@ -194,13 +254,13 @@ export default function Form(props: FormProps): JSX.Element {
                         <button
                             className={ clsx( s.btn, motherRefType === "id" && s.btnSelected ) }
                             onClick={ () => setMotherRefType("id") }
-                        > Genitor
+                        > GENITORA
                         </button> 
 
                         <button
                             className={ clsx( s.btn, motherRefType === "family" && s.btnSelected ) }
                             onClick={ () => setMotherRefType("family") }
-                        > Familia
+                        > FAMILIA DA GENITORA
                         </button> 
                     </div>  
 
@@ -215,19 +275,53 @@ export default function Form(props: FormProps): JSX.Element {
                             : e => setMotherFamily(e.currentTarget.value)
                         }
                         onFocus={ () => {
-                            setListMotherShown(true)
-                            setListFatherShown(false)
+                            setMotherListShown(true)
+                            setFatherListShown(false)
+                            setPartnersListShown(false)
                         } }
-                        onBlur={ () => setListMotherShown(false) }
+                        onBlur={ () => setMotherListShown(false) }
+                        autoComplete="off"
                     />
 
                     {
-                        listMotherShown &&
-                        <List
-                            data={ motherRefType === "id" ? motherPeople : motherFamilies }
-                            setState={ motherRefType === "id" ? setMotherId : setMotherFamily }
-                            type={ motherRefType === "id" ? "id" : "nome" }
-                        />
+                        motherListShown && motherRefType === "id" &&
+                        <ul className={ s.list }>
+                            {
+                                motherPeople.map(item => (
+                                    <li 
+                                        className={ s.item }
+                                        key={ item.id }
+                                        onMouseDown={ () => {
+                                            setMotherId(item.id);
+                                            setMotherFilter(item.nome)
+                                        } }
+                                    > 
+                                        {
+                                            item.dataNascimento &&
+                                            <span>{ new Date(item.dataNascimento).getFullYear() }</span>
+                                        }
+            
+                                        <span>{ item.nome }</span>
+                                    </li>
+                                ))
+                            }
+                        </ul>
+                    }
+
+                    {
+                        motherListShown && motherRefType === "family" &&
+                        <ul className={ s.list }>
+                            {
+                                motherFamilies.map(item => (
+                                    <li 
+                                        className={ s.item }
+                                        key={ item.id }
+                                        onMouseDown={ () => setMotherFamily(item.nome) }
+                                    > { item.nome }
+                                    </li>
+                                ))
+                            }
+                        </ul>
                     }
                 </div>
 
@@ -246,7 +340,8 @@ export default function Form(props: FormProps): JSX.Element {
                             id="birthDate"
                             placeholder="DD/MM/AAAA"
                             value={ birthDate }
-                            onChange={ e => setBirthDate(e.currentTarget.value) }
+                            onChange={ e => setBirthDate(formatDate(e.currentTarget.value)) }
+                            autoComplete="off"
                         />
 
                         <input 
@@ -257,6 +352,7 @@ export default function Form(props: FormProps): JSX.Element {
                             placeholder="Local"
                             value={ birthPlace }
                             onChange={ e => setBirthPlace(e.currentTarget.value) }
+                            autoComplete="off"
                         />
                     </div>
                 </div>
@@ -276,7 +372,8 @@ export default function Form(props: FormProps): JSX.Element {
                             id="baptismDate"
                             placeholder="DD/MM/AAAA"
                             value={ baptismDate }
-                            onChange={ e => setBaptismDate(e.currentTarget.value) }
+                            onChange={ e => setBaptismDate(formatDate(e.currentTarget.value)) }
+                            autoComplete="off"
                         />
 
                         <input 
@@ -287,6 +384,7 @@ export default function Form(props: FormProps): JSX.Element {
                             placeholder="Local"
                             value={ baptismPlace }
                             onChange={ e => setBaptismPlace(e.currentTarget.value) }
+                            autoComplete="off"
                         />
                     </div>
                 </div>
@@ -306,7 +404,8 @@ export default function Form(props: FormProps): JSX.Element {
                             id="deathDate"
                             placeholder="DD/MM/AAAA"
                             value={ deathDate }
-                            onChange={ e => setDeathDate(e.currentTarget.value) }
+                            onChange={ e => setDeathDate(formatDate(e.currentTarget.value)) }
+                            autoComplete="off"
                         />
 
                         <input 
@@ -317,40 +416,116 @@ export default function Form(props: FormProps): JSX.Element {
                             placeholder="Local"
                             value={ deathPlace }
                             onChange={ e => setDeathPlace(e.currentTarget.value) }
+                            autoComplete="off"
                         />
                     </div>
                 </div>
+
+                <div className={ clsx(s.partners) }>
+                    <div className={ clsx(s.label) }>
+                        Matrimônios            
+                    </div>
+
+                    <div className={ clsx(s.searchbar) }>
+                        <FaMagnifyingGlass className={ clsx(s.icon) }/>
+                        <input 
+                            className={ clsx(s.input) }
+                            type="text" 
+                            name="partnersFilter" 
+                            id="partnersFilter"
+                            placeholder="Digite o nome da pessoa"
+                            value={ partnersFilter } 
+                            onChange={ e => setPartnersFilter(e.currentTarget.value) }
+                            onFocus={ () => {
+                                setPartnersListShown(true)
+                                setMotherListShown(false)
+                                setFatherListShown(false)
+                            } }
+                            onBlur={ () => setPartnersListShown(false) }
+                            autoComplete="off"
+                        />
+
+                        {
+                            partnersListShown &&
+                            <ul className={ s.list }>
+                                {
+                                    partnersPeople.map(item => (
+                                        <li 
+                                            className={ s.item }
+                                            key={ item.id }
+                                            onMouseDown={ () => {
+                                                setPartners((prevPartners) => ([...prevPartners, item]));
+                                                setPartnersFilter("")
+                                            } }
+                                        > 
+                                            {
+                                                item.dataNascimento &&
+                                                <span>{ new Date(item.dataNascimento).getFullYear() }</span>
+                                            }
+                
+                                            <span>{ item.nome }</span>
+                                        </li>
+                                    ))
+                                }
+                            </ul>
+                        }
+                    </div>
+
+                    <div className={ clsx(s.people) }>
+                        {
+                            partners.map((person: Person) => (
+                                <div className={ clsx(s.partner) }>
+                                    <FaMinus 
+                                        className={ clsx(s.icon) }
+                                        onClick={ () => setPartners(partners.filter(p => p.id !== person.id)) }
+                                    />
+
+                                    <div className={ clsx(s.person) }>
+                                        {
+                                            person.dataNascimento &&
+                                            <span>{ new Date(person.dataNascimento).getFullYear() }</span>
+                                        }
+
+                                        <span>{ person.nome }</span>
+                                    </div>
+                                </div>
+                            ))
+                        }
+                    </div>
+                </div>
             </div>
+
+            <Btn
+                color="white"
+                bgColor="green"
+                text="CRIAR PESSOA"
+                type="submit"
+            />
         </form>
     )
 
-    type ListProps = {
-        data: Person[] | Family[],
-        setState: StateSetter<string>,
-        type: "id" | "nome",
-    }
-
-    function List(props: ListProps): JSX.Element {
-        const { data, setState, type } = props;
-        
-        return (
-            <ul className={ s.list }>
-                {
-                    data.map(item => (
-                        <li 
-                            className={ s.item }
-                            key={ item.id }
-                            onClick={ () => setState(item[type]) }
-                        > { item.nome }
-                        </li>
-                    ))
-                }
-            </ul>
-        )
-    }
-
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
+        console.log("submitted")
+
+        if (type === "create") {
+            setName("");
+            setFatherId("");
+            setFatherFamily("");
+            setMotherId("");
+            setMotherFamily("");
+            
+            setBirthDate("");
+            setBirthPlace("");
+            setBaptismDate("");
+            setBaptismPlace("");
+            setDeathDate("");
+            setDeathPlace("");
+
+            setPartners([]);
+        }
+
+        toast.success("Pessoa criada com sucesso!");
     }
 
     async function getPeopleAndFamilies() {
@@ -375,8 +550,25 @@ export default function Form(props: FormProps): JSX.Element {
         const dataPeople = await resPeople.json();
         const dataFamilies = await resFamilies.json();
         
-        setPeople(dataPeople);
-        setFamilies(dataFamilies);
+        const sortedPeople = dataPeople.sort((a: Person, b: Person) => {
+            if (a.dataNascimento === null && b.dataNascimento === null) 
+              return 0
+            
+            else if (a.dataNascimento === null) 
+              return 1
+            
+            
+            else if (b.dataNascimento === null) 
+              return -1
+            
+            else 
+              return new Date(a.dataNascimento).getTime() - new Date(b.dataNascimento).getTime();
+          });
+
+        const sortedFamilies = dataFamilies.sort((a: Family, b: Family) => a.nome.localeCompare(b.nome))
+
+        setPeople(sortedPeople);
+        setFamilies(sortedFamilies);
         setLoading(false);
     }
 }

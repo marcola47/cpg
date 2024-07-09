@@ -3,7 +3,8 @@ import React from "react";
 import {
     Familia as FamiliaPrisma,
     Pessoa as PessoaPrisma,
-    FamiliaPessoa as FamiliaPessoaPrisma
+    FamiliaPessoa as FamiliaPessoaPrisma,
+    Casamento as CasamentoPrisma
 } from "@prisma/client";
 
 declare global {
@@ -13,12 +14,15 @@ declare global {
     };
 
     type Person = PessoaPrisma & {
-        familias?: Partial<Family>[];
-        genitor?: Partial<Person>;
-        genitora?: Partial<Person>;
+        familias?: Partial<Family>[],
+        genitor?: Partial<Person>,
+        genitora?: Partial<Person>,
+        esposo?: Mariage[],
+        esposa?: Mariage[],
     };
 
     type FamilyPerson = FamiliaPessoaPrisma;
+    type Marriage = CasamentoPrisma;
     type StateSetter<T> = React.Dispatch<React.SetStateAction<T>>;
 }
 

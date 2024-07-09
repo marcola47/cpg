@@ -22,6 +22,7 @@ type CommonBtnProps = {
     transition?: "grow" | "fill" | "border" | "bg" | "color",
     fillColor?: colors,
     fullWidth?: boolean,
+    type?: "button" | "submit"
 }
 
 type BtnProps = 
@@ -30,10 +31,25 @@ type BtnProps =
         href: string,
         onClick?: undefined,
     })
-
+    
     | (CommonBtnProps & { 
         link?: false,
         href?: undefined,
+        type: "button",
+        onClick: (e?: any) => any,
+    })
+    
+    | (CommonBtnProps & { 
+        link?: false,
+        href?: undefined,
+        type: "submit",
+        onClick?: undefined,
+    })
+    
+    | (CommonBtnProps & {
+        link?: false,
+        href?: undefined,
+        type?: undefined,
         onClick: (e?: any) => any,
     });
 
@@ -51,7 +67,8 @@ export function Btn(props: BtnProps): JSX.Element {
         iconColor,
         transition,
         fillColor,
-        fullWidth
+        fullWidth,
+        type
     } = props;
     
     const btnColor = color 
@@ -106,6 +123,7 @@ export function Btn(props: BtnProps): JSX.Element {
         <button 
             className={ className }
             onClick={ onClick }
+            type={ type || "button" }
         >   
             {
                 loading 

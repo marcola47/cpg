@@ -36,6 +36,7 @@
             display: flex;
             flex-direction: column;
             gap: 4px;
+            position: relative;
             
             &Name, &Father, &Mother {
                 grid-column: 1;
@@ -66,6 +67,122 @@
                 padding: 8px;
                 border: 2px solid $grey-dark;
                 border-radius: $br-s;
+            }
+
+            .btns {
+                display: flex;
+                gap: 8px;
+            }
+    
+            .btn {
+                padding: 4px 12px;
+                border: 2px solid $orange-500;
+                border-radius: $br-s;
+                @include transition;
+
+                &Selected {
+                    background-color: $orange-500;
+                }
+            }
+        }
+
+        .list {
+            z-index: 2;
+            overflow-y: auto;
+            position: absolute;
+            top: 76px;
+            max-height: 256px;
+            width: 100%;
+            border: 2px solid $grey-dark;
+            border-radius: $br-s;
+
+            list-style: none;
+            background-color: #fff;
+            @include scrollbar_small;
+
+            .item {
+                display: flex;
+
+                padding: 8px 12px;
+                cursor: pointer;
+                @include transition;
+
+                & > * {
+                    min-width: 48px;
+                }
+
+                &:hover {
+                    background-color: lighten($grey-light, 30%);
+                }
+            }
+        }
+
+        .partners {
+            grid-column: span 2;
+            display: flex;
+            flex-direction: column;
+
+            .searchbar {
+                position: relative;
+                margin-block: 4px 16px;
+
+                .icon {
+                    z-index: 1;
+                    position: absolute;
+                    top: 10px;
+                    left: 10px;
+                    width: 16px;
+                    height: 16px;
+                }
+                
+                .input {
+                    width: 100%;
+                    padding: 8px 8px 8px 32px;
+                    border: 2px solid $grey-dark;
+                    border-radius: $br-s;
+                }
+
+                .list {
+                    top: 40px;
+                }
+            }
+
+            .people {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+
+                .partner {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+
+                    & > * {
+                        padding: 8px;
+                        border: 2px solid $grey-dark;
+                        border-radius: $br-s;
+                    }
+
+                    .icon {
+                        width: 40px;
+                        height: 40px;
+                        cursor: pointer;
+                        @include transition;
+
+                        &:hover {
+                            background-color: $orange-500;
+                        }
+                    }
+
+                    .person {
+                        width: 100%;
+
+                        span {
+                            display: inline-block;
+                            min-width: 48px;
+                        }
+                    }
+                }
             }
         }
     }
