@@ -10,6 +10,13 @@ export async function GET(req: NextRequest) {
     );
 }
 
+const parseDate = (dateString: string): Date | null => {
+    const [day, month, year] = dateString.split('/').map(Number);
+    const date = new Date(year, month - 1, day);
+
+    return isNaN(date.getTime()) ? null : date;
+};
+
 export async function POST(req: NextRequest) {
     try {
         const data = await req.json();
@@ -25,19 +32,18 @@ export async function POST(req: NextRequest) {
         }
 
         await prisma.$transaction(async prisma => {
+            console.log(data.genitorId)
+            console.log(data.genitoraId)
+
             const pessoa = await prisma.pessoa.create({ 
                 data: {
                     nome: data.nome,
-                    ...(data.genitorId ? { genitorId: data.genitorId } : { genitorFamilia: data.genitorFamilia }),
-                    ...(data.genitoraId ? { genitoraId: data.genitoraId } : { genitoraFamilia: data.genitoraFamilia }),
-    
-                    dataNascimento: new Date(data.dataNascimento),
+                    dataNascimento: parseDate(data.dataNascimento),
                     localNascimento: data.localNascimento,
-                    dataBatismo: new Date(data.dataBatismo),
+                    dataBatismo: parseDate(data.dataBatismo),
                     localBatismo: data.localBatismo,
-                    dataFalecimento: new Date(data.dataFalecimento),
+                    dataFalecimento: parseDate(data.dataFalecimento),
                     localFalecimento: data.localFalecimento,
-    
                     observacoes: data.observacoesObj
                 } 
             })
@@ -87,6 +93,15 @@ export async function POST(req: NextRequest) {
                 if (!familia)
                     throw new Error("Não foi possível criar a familia do genitor")
     
+                await prisma.pessoa.update({
+                    where: {
+                        id: pessoa.id
+                    },
+                    data: {
+                        genitorFamilia: familia.id
+                    }
+                })
+
                 const f = await prisma.familiaPessoa.findFirst({
                     where: {
                         familiaId: familia.id,
@@ -120,6 +135,15 @@ export async function POST(req: NextRequest) {
                 if (!familia)
                     throw new Error("Não foi possível criar a familia da genitora")
     
+                await prisma.pessoa.update({
+                    where: {
+                        id: pessoa.id
+                    },
+                    data: {
+                        genitoraFamilia: familia.id
+                    }
+                })
+
                 const f = await prisma.familiaPessoa.findFirst({
                     where: {
                         familiaId: familia.id,
@@ -143,7 +167,7 @@ export async function POST(req: NextRequest) {
                         data: {
                             esposaId: casamento.person.id,
                             esposoId: pessoa.id,
-                            dataCasamento: new Date(casamento.date),
+                            dataCasamento: parseDate(casamento.date),
                             localCasamento: casamento.place
                         }
                     })
@@ -156,7 +180,7 @@ export async function POST(req: NextRequest) {
                         data: {
                             esposaId: pessoa.id,
                             esposoId: casamento.person.id,
-                            dataCasamento: new Date(casamento.date),
+                            dataCasamento: parseDate(casamento.date),
                             localCasamento: casamento.place
                         }
                     })

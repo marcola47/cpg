@@ -726,22 +726,22 @@ export default function Form(props: FormProps): JSX.Element {
         console.log(await res.json());
 
         if (type === "create") {
-            // setName("");
-            // setFatherId("");
-            // setFatherFamily("");
-            // setMotherId("");
-            // setMotherFamily("");
+            setName("");
+            setFatherId("");
+            setFatherFamily("");
+            setMotherId("");
+            setMotherFamily("");
             
-            // setBirthDate("");
-            // setBirthPlace("");
-            // setBaptismDate("");
-            // setBaptismPlace("");
-            // setDeathDate("");
-            // setDeathPlace("");
+            setBirthDate("");
+            setBirthPlace("");
+            setBaptismDate("");
+            setBaptismPlace("");
+            setDeathDate("");
+            setDeathPlace("");
 
-            // setGender("male")
-            // setPartners([]);
-            // setObservations([])
+            setGender("male")
+            setPartners([]);
+            setObservations([])
 
             toast.success("Pessoa criada com sucesso!");
         }

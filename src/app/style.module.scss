@@ -12,11 +12,12 @@
     .grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        place-items: center;
+        place-items: start center;
         gap: 24px;
         
         overflow-y: auto;
         max-height: 80dvh;
+        min-height: 216px;
         padding-right: 4px;
         @include scrollbar_medium;
     }
