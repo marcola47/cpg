@@ -155,6 +155,7 @@ export default function Form(props: FormProps): JSX.Element {
         <form 
             className={ clsx(s.form) }
             onSubmit={ handleSubmit }
+            onKeyDown={ e => e.key === "Enter" && e.preventDefault() }
         >
             {
                 location === "modal" &&
@@ -719,7 +720,7 @@ export default function Form(props: FormProps): JSX.Element {
         })
 
         if (!res.ok) {
-            toast.error("Ocorreu um erro ao criar pessoa. Por favor, tente novamente.")
+            toast.error("Ocorreu um erro ao criar pessoa. Por favor, verifique os dados e tente novamente.")
             return;
         }
 
@@ -729,8 +730,10 @@ export default function Form(props: FormProps): JSX.Element {
             setName("");
             setFatherId("");
             setFatherFamily("");
+            setFatherFilter("");
             setMotherId("");
             setMotherFamily("");
+            setMotherFilter("");
             
             setBirthDate("");
             setBirthPlace("");

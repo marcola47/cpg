@@ -11,6 +11,9 @@ export async function GET(req: NextRequest) {
 }
 
 const parseDate = (dateString: string): Date | null => {
+    if (!dateString)
+        return null;
+    
     const [day, month, year] = dateString.split('/').map(Number);
     const date = new Date(year, month - 1, day);
 
@@ -32,12 +35,12 @@ export async function POST(req: NextRequest) {
         }
 
         await prisma.$transaction(async prisma => {
-            console.log(data.genitorId)
-            console.log(data.genitoraId)
-
             const pessoa = await prisma.pessoa.create({ 
                 data: {
                     nome: data.nome,
+                    ...(data.genitorId && { genitorId: data.genitorId }),
+                    ...(data.genitoraId && { genitoraId: data.genitoraId }),
+                    
                     dataNascimento: parseDate(data.dataNascimento),
                     localNascimento: data.localNascimento,
                     dataBatismo: parseDate(data.dataBatismo),
