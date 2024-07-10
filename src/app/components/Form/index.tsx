@@ -37,6 +37,9 @@ export default function Form(props: FormProps): JSX.Element {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<any>("");
     
+    const [people, setPeople] = useState<Person[]>([])
+    const [families, setFamilies] = useState<Person[]>([])
+
     const [fatherListShown, setFatherListShown] = useState<boolean>(false);
     const [fatherRefType, setFatherRefType] = useState<"id" | "family">("id")
     const [fatherFilter, setFatherFilter] = useState<string>("")
@@ -52,9 +55,6 @@ export default function Form(props: FormProps): JSX.Element {
     const [partnersListShown, setPartnersListShown] = useState<boolean>(false);
     const [partnersFilter, setPartnersFilter] = useState<string>("");
     const [partnersPeople, setPartnersPeople] = useState<Person[]>([])
-    
-    const [people, setPeople] = useState<Person[]>([])
-    const [families, setFamilies] = useState<Person[]>([])
     
     const [name, setName] = useState<string>(person?.nome || "")
     const [fatherId, setFatherId] = useState<string>(person?.genitorId || "");
@@ -534,16 +534,11 @@ export default function Form(props: FormProps): JSX.Element {
 
                     <div className={ clsx(s.people) }>
                         {
-<<<<<<< HEAD
-                            partners.map((person: Person) => (
-                                <div className={ clsx(s.partner) } key={person.id}>
-=======
                             partners.map((partner: Partner) => (
                                 <div 
                                     className={ clsx(s.partner) }
                                     key={ partner.person.id }
                                 >
->>>>>>> bb4ad9964ef938b59bb7f5426fa7f3b7409466bb
                                     <FaMinus 
                                         className={ clsx(s.icon) }
                                         onClick={ () => setPartners(partners.filter(p => p.person.id !== partner.person.id)) }
@@ -697,7 +692,31 @@ export default function Form(props: FormProps): JSX.Element {
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        console.log("submitted")
+
+        const res = await fetch("/api/pessoa", {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json",
+            },
+            body: JSON.stringify({
+                nome: name,
+                genitorId: fatherId,
+                genitorFamilia: fatherFamily,
+                genitoraId: motherId,
+                genitoraFamilia: motherFamily,
+
+                dataNascimento: birthDate,
+                localNascimento: birthPlace,
+                dataBatismo: baptismDate,
+                localBatismo: baptismPlace,
+                dataFalecimento: deathDate,
+                localFalecimento: deathPlace,
+
+                genero: gender,
+                casamentos: partners,
+                observacoes: observations
+            })
+        })
 
         if (type === "create") {
             setName("");
@@ -716,9 +735,11 @@ export default function Form(props: FormProps): JSX.Element {
             setGender("male")
             setPartners([]);
             setObservations([])
+            toast.success("Pessoa criada com sucesso!");
         }
 
-        toast.success("Pessoa criada com sucesso!");
+        else 
+            toast.success("Pessoa editada com sucesso!")
     }
 
     async function getPeopleAndFamilies() {

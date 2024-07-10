@@ -20,9 +20,41 @@ export async function POST(req: NextRequest) {
         const pessoa = await prisma.pessoa.create({ 
             data: {
                 nome: data.nome,
+                ...(data.genitorId ? { genitorId: data.genitorId } : { genitorFamilia: data.genitorFamilia }),
+                ...(data.genitoraId ? { genitoraId: data.genitoraId } : { genitoraFamilia: data.genitoraFamilia }),
 
+                dataNascimento: data.dataNascimento,
+                localNascimento: data.localNascimento,
+                dataBatismo: data.dataBatismo,
+                localBatismo: data.localBatismo,
+                dataFalecimento: data.dataFalecimento,
+                localFalecimento: data.localFalecimento,
             } 
         })
+
+        if (data.genitorId || data.genitoraId) {
+            const familias = await prisma.familiaPessoa.findMany({
+                where: {
+                    OR:[
+                        {
+                            pessoaId: data.genitorId
+                        },
+                        {
+                            pessoaId: data.genitoraId
+                        }
+                    ]
+                }
+            });
+            
+            for (const f of familias) {
+                await prisma.familiaPessoa.create({
+                    data: {
+                        familiaId: f.familiaId,
+                        pessoaId: pessoa.id
+                    }
+                })
+            }
+        }
 
         if (!data.genitorId) {
             const familia = await prisma.familia.upsert({
@@ -48,7 +80,7 @@ export async function POST(req: NextRequest) {
             })
         }
 
-        if (!data.genitorId) {
+        if (!data.genitoraId) {
             const familia = await prisma.familia.upsert({
                 where: {
                     nome: data.genitoraFamilia
@@ -72,27 +104,27 @@ export async function POST(req: NextRequest) {
             })
         }
 
-        if (data.gender === "male") {
-            for (const partner of data.partners) {
+        if (data.genero === "male") {
+            for (const parceiro of data.parceiros) {
                 await prisma.casamento.create({
                     data: {
-                        esposaId: partner.person.id,
+                        esposaId: parceiro.person.id,
                         esposoId: pessoa.id,
-                        dataCasamento: partner.date,
-                        localCasamento: partner.place
+                        dataCasamento: parceiro.date,
+                        localCasamento: parceiro.place
                     }
                 })
             }
         }
 
         else {
-            for (const partner of data.partners) {
+            for (const parceiro of data.parceiros) {
                 await prisma.casamento.create({
                     data: {
-                        esposoId: partner.person.id,
                         esposaId: pessoa.id,
-                        dataCasamento: partner.date,
-                        localCasamento: partner.place
+                        esposoId: parceiro.person.id,
+                        dataCasamento: parceiro.date,
+                        localCasamento: parceiro.place
                     }
                 })
             }
