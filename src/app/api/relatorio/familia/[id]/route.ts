@@ -1,22 +1,33 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import PDFDocument from 'pdfkit';
+import { Document, Paragraph, TextRun, Packer } from "docx";
 
 type FindById = {
     id: string;
 };
 
-export async function POST(req: NextRequest, context: { params: FindById }) {
-    const { cpfOrdenador, nomeOrdenador, userId } = await req.json();
-    console.log(cpfOrdenador, nomeOrdenador, userId)
-    
+export async function POST(req: NextRequest, context: { params: FindById }) {    
     try {
+
+        const { cpfOrdenador, nomeOrdenador, userId } = await req.json();
+        
+        if (!cpfOrdenador || !nomeOrdenador || !userId) {
+            return new NextResponse(
+                JSON.stringify({ error: "Dados inválidos" }), 
+                { status: 400 }
+            );
+        }
+
+
         const familia = await prisma.familia.findFirst({
             where: {
                 id: context.params.id
             }
         });
         
+        console.log(familia);
+        
+
         if (!familia) {
             return new NextResponse(
                 JSON.stringify({ error: "Familia não encontrada" }), 
@@ -97,6 +108,9 @@ export async function POST(req: NextRequest, context: { params: FindById }) {
             stringFamily += '\n';            
         }   
 
+        console.log("chegou aqui");
+        
+
         const relatorio = await prisma.relatorio.create({
             data: {
                 cpfOrdenador,
@@ -107,9 +121,16 @@ export async function POST(req: NextRequest, context: { params: FindById }) {
             }
         })
 
+
+        const doc = await generateDocx(stringFamily);
+        const buffer = await Packer.toBuffer(doc);
+
         return new NextResponse(
-            JSON.stringify(relatorio), 
-            { status: 200 }
+            buffer, 
+            { status: 200, headers: { 
+                'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ,
+                'Content-Disposition': `attachment; filename="RelatorioFamilia${context.params.id}.docx"`
+            } }
         );
 
     }
@@ -233,4 +254,39 @@ export async function POST(req: NextRequest, context: { params: FindById }) {
         
         return date.toISOString().split('T')[0].replace(/-/g, '/');
     }
+}
+
+async function generateDocx(relatorio: string){
+
+    const date = new Date();
+    const dateString = "\t\t\t\tNova Palma, " + date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear() + "\n";
+
+    const doc = new Document({
+        sections: [
+            {
+                properties: {},
+                children: [
+                    new Paragraph({
+                        children: [
+                            new TextRun({
+                                text: "CENTRO DE PESQUISAS GENEALÓGICAS DE NOVA PALMA (CPG)\n",
+                                allCaps: true,
+                            })
+                            ,
+                            new TextRun({
+                                text: dateString,
+
+                            }),
+                            
+                            new TextRun({
+                                text: relatorio
+                            })
+                        ]
+                    })
+                ]
+            }
+        ]
+    });
+
+    return doc;
 }

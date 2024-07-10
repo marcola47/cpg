@@ -7,6 +7,7 @@ import { Btn } from "@/app/components/Btn";
 
 import clsx from "clsx";
 import s from "./style.module.scss";
+import { log } from "console";
 
 export default function Card({ family }: { family: Family }): JSX.Element {
     return (
@@ -27,7 +28,30 @@ export default function Card({ family }: { family: Family }): JSX.Element {
 
             <div className={ clsx(s.btns) }>
                 <Btn
-                    onClick={ () => {} }
+                    onClick={ async () => {
+                        const response = await fetch(`/api/relatorio/familia/${family.id}`, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify(
+                                {
+                                    "cpfOrdenador":"041-267-810-13",
+                                    "userId": "31e0771e-1b9e-4d34-9c3b-2b8766337657",
+                                    "nomeOrdenador":"Felipe"
+                                }
+                            ),
+                        });
+                        const blob = await response.blob();
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `RelatorioFamilia${family.id}.docx`;
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+
+                    }}
                     color="blue"
                     borderColor="blue"
                     

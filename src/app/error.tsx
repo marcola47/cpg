@@ -8,8 +8,15 @@ type ErrorProps = {
 
 export default function Error(props: ErrorProps) {
     const { error, reset } = props;
-    const status = error.message.split("_")[0];
-    const message = error.message.split("_")[1];
+    let status, message;
+    try{
+        status = error.message.split("_")[0];
+        message = error.message.split("_")[1];
+    }catch(e){
+        status = "500";
+        message = "Ocorreu um erro inesperado ao processar sua requisição.";
+    }
+    
     let title = "", subtitle = "";
 
     switch (status) {

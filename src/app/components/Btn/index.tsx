@@ -29,7 +29,7 @@ type BtnProps =
     | (CommonBtnProps & { 
         link: true,
         href: string,
-        onClick?: undefined,
+        onClick?: any,
     })
     
     | (CommonBtnProps & { 
