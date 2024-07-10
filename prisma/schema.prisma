@@ -15,8 +15,8 @@ model Familia {
     updatedAt DateTime        @updatedAt
 
     membros   FamiliaPessoa[]
-    genitores Pessoa[] @relation("GenitorFamilia")
-    genitoras Pessoa[] @relation("GenitoraFamilia")
+    genitores Pessoa[]        @relation("GenitorFamilia")
+    genitoras Pessoa[]        @relation("GenitoraFamilia")
     Relatorio Relatorio[]
 }
 

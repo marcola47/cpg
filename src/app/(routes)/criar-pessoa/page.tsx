@@ -9,7 +9,7 @@ export default async function Page(): Promise<JSX.Element> {
         <div className={ clsx(app.page, s.page) }>
             <Form 
                 type="create"
-                location="modal"
+                location="page"
             />
         </div>
     )
