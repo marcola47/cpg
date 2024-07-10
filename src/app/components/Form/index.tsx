@@ -182,7 +182,7 @@ export default function Form(props: FormProps): JSX.Element {
                         type="text" 
                         name="name"
                         id="name"
-                        placeholder="Apenas o nome sem sobrenome"
+                        placeholder="Fulano Soprano Ferrari"
                         value={ name }
                         onChange={ e => setName(e.currentTarget.value) }
                         autoComplete="off"
@@ -718,23 +718,31 @@ export default function Form(props: FormProps): JSX.Element {
             })
         })
 
-        if (type === "create") {
-            setName("");
-            setFatherId("");
-            setFatherFamily("");
-            setMotherId("");
-            setMotherFamily("");
-            
-            setBirthDate("");
-            setBirthPlace("");
-            setBaptismDate("");
-            setBaptismPlace("");
-            setDeathDate("");
-            setDeathPlace("");
+        if (!res.ok) {
+            toast.error("Ocorreu um erro ao criar pessoa. Por favor, tente novamente.")
+            return;
+        }
 
-            setGender("male")
-            setPartners([]);
-            setObservations([])
+        console.log(await res.json());
+
+        if (type === "create") {
+            // setName("");
+            // setFatherId("");
+            // setFatherFamily("");
+            // setMotherId("");
+            // setMotherFamily("");
+            
+            // setBirthDate("");
+            // setBirthPlace("");
+            // setBaptismDate("");
+            // setBaptismPlace("");
+            // setDeathDate("");
+            // setDeathPlace("");
+
+            // setGender("male")
+            // setPartners([]);
+            // setObservations([])
+
             toast.success("Pessoa criada com sucesso!");
         }
 

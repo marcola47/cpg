@@ -17,126 +17,162 @@ export async function POST(req: NextRequest) {
         if (!data)
             throw new Error("Alguns dados da requisição estão faltando")
         
-        const pessoa = await prisma.pessoa.create({ 
-            data: {
-                nome: data.nome,
-                ...(data.genitorId ? { genitorId: data.genitorId } : { genitorFamilia: data.genitorFamilia }),
-                ...(data.genitoraId ? { genitoraId: data.genitoraId } : { genitoraFamilia: data.genitoraFamilia }),
+        if (data.observacoes.length > 0) {
+            data.observacoesObj = data.observacoes.reduce((acc: any, obs: any) => {
+                acc[obs.key] = obs.value;
+                return acc;
+            }, {} as Record<string, string>)
+        }
 
-                dataNascimento: data.dataNascimento,
-                localNascimento: data.localNascimento,
-                dataBatismo: data.dataBatismo,
-                localBatismo: data.localBatismo,
-                dataFalecimento: data.dataFalecimento,
-                localFalecimento: data.localFalecimento,
-            } 
-        })
-
-        if (data.genitorId || data.genitoraId) {
-            const familias = await prisma.familiaPessoa.findMany({
-                where: {
-                    OR:[
-                        {
-                            pessoaId: data.genitorId
-                        },
-                        {
-                            pessoaId: data.genitoraId
+        await prisma.$transaction(async prisma => {
+            const pessoa = await prisma.pessoa.create({ 
+                data: {
+                    nome: data.nome,
+                    ...(data.genitorId ? { genitorId: data.genitorId } : { genitorFamilia: data.genitorFamilia }),
+                    ...(data.genitoraId ? { genitoraId: data.genitoraId } : { genitoraFamilia: data.genitoraFamilia }),
+    
+                    dataNascimento: new Date(data.dataNascimento),
+                    localNascimento: data.localNascimento,
+                    dataBatismo: new Date(data.dataBatismo),
+                    localBatismo: data.localBatismo,
+                    dataFalecimento: new Date(data.dataFalecimento),
+                    localFalecimento: data.localFalecimento,
+    
+                    observacoes: data.observacoesObj
+                } 
+            })
+    
+            if (data.genitorId || data.genitoraId) {
+                const familias = await prisma.familiaPessoa.findMany({
+                    where: {
+                        OR:[
+                            { pessoaId: data.genitorId },
+                            { pessoaId: data.genitoraId }
+                        ]
+                    }
+                });
+                    
+                for (const familia of familias) {
+                    const f = await prisma.familiaPessoa.findFirst({
+                        where: {
+                            familiaId: familia.familiaId,
+                            pessoaId: pessoa.id
                         }
-                    ]
+                    })
+                    
+                    if (!f) {
+                        await prisma.familiaPessoa.create({
+                            data: {
+                                familiaId: familia.familiaId,
+                                pessoaId: pessoa.id
+                            }
+                        })
+                    }
                 }
-            });
-            
-            for (const f of familias) {
-                await prisma.familiaPessoa.create({
-                    data: {
-                        familiaId: f.familiaId,
+            }
+    
+            if (!data.genitorId) {
+                const familia = await prisma.familia.upsert({
+                    where: {
+                        nome: data.genitorFamilia
+                    },
+                    update: {
+                        nome: data.genitorFamilia
+                    },
+                    create: {
+                        nome: data.genitorFamilia
+                    }
+                })
+                
+                if (!familia)
+                    throw new Error("Não foi possível criar a familia do genitor")
+    
+                const f = await prisma.familiaPessoa.findFirst({
+                    where: {
+                        familiaId: familia.id,
                         pessoaId: pessoa.id
                     }
-                })
+                })
+    
+                if (!f) {
+                    await prisma.familiaPessoa.create({
+                        data: {
+                            pessoaId: pessoa.id,
+                            familiaId: familia.id,
+                        }
+                    })
+                }
             }
-        }
-
-        if (!data.genitorId) {
-            const familia = await prisma.familia.upsert({
-                where: {
-                    nome: data.genitorFamilia
-                },
-                update: {
-                    nome: data.genitorFamilia
-                },
-                create: {
-                    nome: data.genitorFamilia
-                }
-            })
-            
-            if (!familia)
-                throw new Error("Não foi possível criar a familia do genitor")
-
-            await prisma.familiaPessoa.create({
-                data: {
-                    pessoaId: pessoa.id,
-                    familiaId: familia.id,
-                }
-            })
-        }
-
-        if (!data.genitoraId) {
-            const familia = await prisma.familia.upsert({
-                where: {
-                    nome: data.genitoraFamilia
-                },
-                update: {
-                    nome: data.genitoraFamilia
-                },
-                create: {
-                    nome: data.genitoraFamilia
-                }
-            })
-            
-            if (!familia)
-                throw new Error("Não foi possível criar a familia da genitora")
-
-            await prisma.familiaPessoa.create({
-                data: {
-                    pessoaId: pessoa.id,
-                    familiaId: familia.id,
-                }
-            })
-        }
-
-        if (data.genero === "male") {
-            for (const parceiro of data.parceiros) {
-                await prisma.casamento.create({
-                    data: {
-                        esposaId: parceiro.person.id,
-                        esposoId: pessoa.id,
-                        dataCasamento: parceiro.date,
-                        localCasamento: parceiro.place
+    
+            if (!data.genitoraId) {
+                const familia = await prisma.familia.upsert({
+                    where: {
+                        nome: data.genitoraFamilia
+                    },
+                    update: {
+                        nome: data.genitoraFamilia
+                    },
+                    create: {
+                        nome: data.genitoraFamilia
                     }
                 })
-            }
-        }
-
-        else {
-            for (const parceiro of data.parceiros) {
-                await prisma.casamento.create({
-                    data: {
-                        esposaId: pessoa.id,
-                        esposoId: parceiro.person.id,
-                        dataCasamento: parceiro.date,
-                        localCasamento: parceiro.place
+                
+                if (!familia)
+                    throw new Error("Não foi possível criar a familia da genitora")
+    
+                const f = await prisma.familiaPessoa.findFirst({
+                    where: {
+                        familiaId: familia.id,
+                        pessoaId: pessoa.id
                     }
                 })
+    
+                if (!f) {
+                    await prisma.familiaPessoa.create({
+                        data: {
+                            pessoaId: pessoa.id,
+                            familiaId: familia.id,
+                        }
+                    })
+                }
             }
-        }
+    
+            if (data.genero === "male") {
+                for (const casamento of data.casamentos) {
+                    await prisma.casamento.create({
+                        data: {
+                            esposaId: casamento.person.id,
+                            esposoId: pessoa.id,
+                            dataCasamento: new Date(casamento.date),
+                            localCasamento: casamento.place
+                        }
+                    })
+                }
+            }
+    
+            else {
+                for (const casamento of data.casamentos) {
+                    await prisma.casamento.create({
+                        data: {
+                            esposaId: pessoa.id,
+                            esposoId: casamento.person.id,
+                            dataCasamento: new Date(casamento.date),
+                            localCasamento: casamento.place
+                        }
+                    })
+                }
+            }
+        })
         
         return new NextResponse(
-            JSON.stringify(pessoa), 
+            JSON.stringify("ok"), 
             { status: 201 }
         );
     }
 
     catch (e) {
+        console.log(e)
+
         return new NextResponse(
             JSON.stringify({ error: e }), 
             { status: 500 }
