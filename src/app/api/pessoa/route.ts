@@ -15,21 +15,30 @@ export async function POST(req: NextRequest) {
         const data = await req.json();
 
         if (!data)
-            throw new Error("")
+            throw new Error("Alguns dados da requisição estão faltando")
         
         const pessoa = await prisma.pessoa.create({ 
-            data 
+            data: {
+                nome: data.nome,
+
+            } 
         })
 
         if (!data.genitorId) {
-            const familia = await prisma.familia.findUnique({
+            const familia = await prisma.familia.upsert({
                 where: {
-                    id: data.genitorFamilia
+                    nome: data.genitorFamilia
+                },
+                update: {
+                    nome: data.genitorFamilia
+                },
+                create: {
+                    nome: data.genitorFamilia
                 }
             })
-
+            
             if (!familia)
-                throw new Error("Não foi possível encontrar a familia do genitor")
+                throw new Error("Não foi possível criar a familia do genitor")
 
             await prisma.familiaPessoa.create({
                 data: {
@@ -39,44 +48,54 @@ export async function POST(req: NextRequest) {
             })
         }
 
-        if (!data.genitoraId) {
-            const familia = await prisma.familia.findUnique({
+        if (!data.genitorId) {
+            const familia = await prisma.familia.upsert({
                 where: {
-                    id: data.genitoraFamilia
+                    nome: data.genitoraFamilia
+                },
+                update: {
+                    nome: data.genitoraFamilia
+                },
+                create: {
+                    nome: data.genitoraFamilia
                 }
             })
-
+            
             if (!familia)
-                throw new Error("Não foi possível encontrar a familia da genitora")
+                throw new Error("Não foi possível criar a familia da genitora")
 
             await prisma.familiaPessoa.create({
                 data: {
                     pessoaId: pessoa.id,
-                    familiaId: familia.id
+                    familiaId: familia.id,
                 }
             })
         }
 
-        if (data.idEsposa) {
-            await prisma.casamento.create({
-                data: {
-                    esposaId: data.idEsposa,
-                    esposoId: pessoa.id,
-                    dataCasamento: data.dataCasamento,
-                    localCasamento: data.localCasamento
-                }
-            });
+        if (data.gender === "male") {
+            for (const partner of data.partners) {
+                await prisma.casamento.create({
+                    data: {
+                        esposaId: partner.person.id,
+                        esposoId: pessoa.id,
+                        dataCasamento: partner.date,
+                        localCasamento: partner.place
+                    }
+                })
+            }
         }
-        
-        else if (data.idEsposo) {
-            await prisma.casamento.create({
-                data: {
-                    esposaId: pessoa.id,
-                    esposoId: data.idEsposo,
-                    dataCasamento: data.dataCasamento,
-                    localCasamento: data.localCasamento
-                }
-            });
+
+        else {
+            for (const partner of data.partners) {
+                await prisma.casamento.create({
+                    data: {
+                        esposoId: partner.person.id,
+                        esposaId: pessoa.id,
+                        dataCasamento: partner.date,
+                        localCasamento: partner.place
+                    }
+                })
+            }
         }
         
         return new NextResponse(
@@ -90,6 +109,18 @@ export async function POST(req: NextRequest) {
             JSON.stringify({ error: e }), 
             { status: 500 }
         );
+    } 
+}
+
+export async function PATCH(req: NextRequest) {
+    try {
+
     }
-  
+
+    catch (e) {
+        return new NextResponse(
+            JSON.stringify({ error: e }), 
+            { status: 500 }
+        );
+    } 
 }

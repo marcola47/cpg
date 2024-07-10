@@ -10,6 +10,7 @@ type colors = "black" | "white" | "grey" | "orange" | "blue" | "red" | "green";
 type CommonBtnProps = {
     loading?: boolean,
     link?: boolean,
+    classes?: string,
 
     color?: colors,
     bgColor?: colors,
@@ -58,6 +59,7 @@ export function Btn(props: BtnProps): JSX.Element {
         onClick,
         loading,
         link,
+        classes,
         href,
         color,
         bgColor,
@@ -110,7 +112,7 @@ export function Btn(props: BtnProps): JSX.Element {
     if (link) {
         return (
             <Link
-                className={ className }
+                className={ `${classes} ${className}` }
                 href={ href }
             > 
                 { icon && icon }
@@ -121,7 +123,7 @@ export function Btn(props: BtnProps): JSX.Element {
 
     return (
         <button 
-            className={ className }
+            className={ `${classes} ${className}` }
             onClick={ onClick }
             type={ type || "button" }
         >   

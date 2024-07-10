@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 import { toast } from "sonner";
-import { FaArrowLeft, FaMinus, FaMagnifyingGlass } from "react-icons/fa6";
+import { FaArrowLeft, FaPlus, FaMinus, FaMagnifyingGlass, FaMars, FaVenus } from "react-icons/fa6";
 import PageError from "@/app/error";
 import PageLoading from "@/app/loading";
 import { Btn } from "@/app/components/Btn";
@@ -12,6 +12,17 @@ import { formatDate } from "@/lib/input-functions";
 
 import clsx from "clsx";
 import s from "./style.module.scss";
+
+type Partner = {
+    person: Person,
+    date?: string,
+    place?: string,
+}
+
+type Observation = {
+    key: string,
+    value: string
+}
 
 type FormProps = {
     type: "create" | "edit";
@@ -58,12 +69,18 @@ export default function Form(props: FormProps): JSX.Element {
     const [deathDate, setDeathDate] = useState<string>("");
     const [deathPlace, setDeathPlace] = useState<string>("");
     
-    const [partners, setPartners] = useState<Person[]>(person?.esposo || person?.esposa || []);
+    const [gender, setGender] = useState<"male" | "female">("male")
+    const [partners, setPartners] = useState<Partner[]>([]);
+    const [observations, setObservations] = useState<Observation[]>([])
+    const [observationKey, setObservationKey] = useState<string>("")
+    const [observationValue, setObservationValue] = useState<string>("")
 
     // POG: Programação Orientada a Gambiarra
     useEffect(() => {
         getPeopleAndFamilies();
     }, [])
+
+    useEffect(() => { console.log(partners) }, [partners])
 
     useEffect(() => {
         if (families) {
@@ -85,7 +102,7 @@ export default function Form(props: FormProps): JSX.Element {
 
     useEffect(() => {
         setFatherPeople(people.filter(p => {
-            const isValidFather = !partners.map(pp => pp.id).includes(p.id) 
+            const isValidFather = !partners.map(pp => pp.person.id).includes(p.id) 
                 && motherId !== p.id
                 && p.nome.toLowerCase().includes(fatherFilter.toLowerCase())
 
@@ -94,7 +111,7 @@ export default function Form(props: FormProps): JSX.Element {
         }))
         
         setMotherPeople(people.filter(p => {
-            const isValidMother = !partners.map(pp => pp.id).includes(p.id) 
+            const isValidMother = !partners.map(pp => pp.person.id).includes(p.id) 
                 && fatherId !== p.id
                 && p.nome.toLowerCase().includes(motherFilter.toLowerCase())
 
@@ -103,7 +120,7 @@ export default function Form(props: FormProps): JSX.Element {
         }))
         
         setPartnersPeople(people.filter(p => {
-            const isValidPartner = !partners.map(pp => pp.id).includes(p.id)
+            const isValidPartner = !partners.map(pp => pp.person.id).includes(p.id)
                 && fatherId !== p.id
                 && motherId !== p.id 
                 && p.nome.toLowerCase().includes(partnersFilter.toLowerCase()) 
@@ -178,12 +195,14 @@ export default function Form(props: FormProps): JSX.Element {
                         <button
                             className={ clsx( s.btn, fatherRefType === "id" && s.btnSelected ) }
                             onClick={ () => setFatherRefType("id") }
-                        > GENITOR
+                            type="button"
+                            > GENITOR
                         </button> 
 
                         <button
                             className={ clsx( s.btn, fatherRefType === "family" && s.btnSelected ) }
                             onClick={ () => setFatherRefType("family") }
+                            type="button"
                         > FAMILIA DO GENITOR
                         </button> 
                     </div>  
@@ -254,12 +273,14 @@ export default function Form(props: FormProps): JSX.Element {
                         <button
                             className={ clsx( s.btn, motherRefType === "id" && s.btnSelected ) }
                             onClick={ () => setMotherRefType("id") }
-                        > GENITORA
+                            type="button"
+                            > GENITORA
                         </button> 
 
                         <button
                             className={ clsx( s.btn, motherRefType === "family" && s.btnSelected ) }
                             onClick={ () => setMotherRefType("family") }
+                            type="button"
                         > FAMILIA DA GENITORA
                         </button> 
                     </div>  
@@ -421,6 +442,46 @@ export default function Form(props: FormProps): JSX.Element {
                     </div>
                 </div>
 
+                <div className={ clsx(s.input, s.inputGender) }>
+                    <label 
+                        className={ clsx(s.label) }
+                        htmlFor="" 
+                    > Gênero
+                    </label>
+
+                    <div className={ clsx(s.btns) }>
+                        <Btn
+                            onClick={ () => setGender("male") }
+                            classes={ gender === "male" ? clsx(s.male) : "" }
+                            
+                            color="blue"
+                            borderColor="blue"
+
+                            text="Masculino"
+                            icon={ <FaMars/> }
+                            iconColor="blue"
+                            
+                            transition="fill"
+                            fillColor="blue"
+                        />
+
+                        <Btn
+                            onClick={ () => setGender("female") }
+                            classes={ gender === "female" ? clsx(s.female) : "" }
+
+                            color="orange"
+                            borderColor="orange"
+
+                            text="Feminino"
+                            icon={ <FaVenus/> }
+                            iconColor="orange"
+                            
+                            transition="fill"
+                            fillColor="orange"
+                        />
+                    </div>
+                </div>
+
                 <div className={ clsx(s.partners) }>
                     <div className={ clsx(s.label) }>
                         Matrimônios            
@@ -454,7 +515,7 @@ export default function Form(props: FormProps): JSX.Element {
                                             className={ s.item }
                                             key={ item.id }
                                             onMouseDown={ () => {
-                                                setPartners((prevPartners) => ([...prevPartners, item]));
+                                                setPartners((prevPartners) => ([...prevPartners, { person: item }]));
                                                 setPartnersFilter("")
                                             } }
                                         > 
@@ -473,21 +534,146 @@ export default function Form(props: FormProps): JSX.Element {
 
                     <div className={ clsx(s.people) }>
                         {
-                            partners.map((person: Person) => (
-                                <div className={ clsx(s.partner) }>
+                            partners.map((partner: Partner) => (
+                                <div 
+                                    className={ clsx(s.partner) }
+                                    key={ partner.person.id }
+                                >
                                     <FaMinus 
                                         className={ clsx(s.icon) }
-                                        onClick={ () => setPartners(partners.filter(p => p.id !== person.id)) }
+                                        onClick={ () => setPartners(partners.filter(p => p.person.id !== partner.person.id)) }
                                     />
 
                                     <div className={ clsx(s.person) }>
-                                        {
-                                            person.dataNascimento &&
-                                            <span>{ new Date(person.dataNascimento).getFullYear() }</span>
-                                        }
+                                        <div className={ clsx(s.name) }>
+                                            {
+                                                partner.person.dataNascimento &&
+                                                <span>{ new Date(partner.person.dataNascimento).getFullYear() }</span>
+                                            }
 
-                                        <span>{ person.nome }</span>
+                                            <span>{ partner.person.nome }</span>
+                                        </div>
+
+                                        <input 
+                                            className={ clsx(s.date) } 
+                                            type="text" 
+                                            name={`${partner.person.id}_name`}
+                                            id={`${partner.person.id}_date`}
+                                            placeholder="DD/MM/AAAA"
+                                            value={ partner.date }
+                                            onChange={ e => {
+                                                const newPartners = partners.map(p => {
+                                                    if (p.person.id === partner.person.id)
+                                                        p.date = formatDate(e.currentTarget.value);
+
+                                                    return p;
+                                                })
+
+                                                setPartners(newPartners);
+                                            } }
+                                            autoComplete="off"
+                                        />
+
+                                        <input 
+                                            className={ clsx(s.place) } 
+                                            type="text" 
+                                            name={`${partner.person.id}_place`}
+                                            id={`${partner.person.id}_place`}
+                                            placeholder="Local"
+                                            value={ partner.place }
+                                            onChange={ e => {
+                                                const newPartners = partners.map(p => {
+                                                    if (p.person.id === partner.person.id)
+                                                        p.place = e.currentTarget.value;
+
+                                                    return p;
+                                                })
+
+                                                setPartners(newPartners);
+                                            } }
+                                            autoComplete="off"
+                                        />
                                     </div>
+                                </div>
+                            ))
+                        }
+                    </div>
+                </div>
+
+                <div className={ clsx(s.observations) }>
+                    <div className={ clsx(s.label) }>
+                        Observações
+                    </div>
+
+                    <div className={ clsx(s.inputs) }>
+                        <input 
+                            className={ clsx(s.field) } 
+                            type="text" 
+                            name="observationKey"
+                            id="observationKey"
+                            placeholder="Nome da observação"
+                            value={ observationKey }
+                            onChange={ e => setObservationKey(e.currentTarget.value) }
+                        />
+
+                        <div className={ clsx(s.colon) }>
+                            :
+                        </div>
+
+                        <input 
+                            className={ clsx(s.field) } 
+                            type="text" 
+                            name="observationValue"
+                            id="observationValue"
+                            placeholder="Dados da observação"
+                            value={ observationValue }
+                            onChange={ e => setObservationValue(e.currentTarget.value) }
+                        />
+
+                        <FaPlus
+                            className={ clsx(s.add) }
+                            onClick={ () => {                                
+                                if (observationKey && observationValue) {
+                                    setObservations((prevObservations) => ([
+                                        ...prevObservations, { 
+                                            key: observationKey.trim(), 
+                                            value: observationValue.trim() 
+                                        }]
+                                    ))
+
+                                    setObservationKey("")
+                                    setObservationValue("")
+                                }
+
+                                else 
+                                    toast.error("Por favor, preencha tanto o campo de nome quanto dados da observação.")
+                            } }
+                        />
+                    </div>
+
+                    <div className={ clsx(s.data) }>
+                        {
+                            observations.map((observation, index) => (
+                                <div 
+                                    className={ clsx(s.observation) }
+                                    key={ index }
+                                >
+                                    <div className={ clsx(s.text) }>
+                                        { observation.key }
+                                    </div>
+
+                                    <div className={ clsx(s.colon) }>
+                                        :
+                                    </div>
+
+                                    <div className={ clsx(s.text) }>
+                                        { observation.value }
+                                    </div>
+
+                                    <FaMinus
+                                        className={ clsx(s.remove) }
+                                        onClick={ () => setObservations(observations.filter(o => o.key !== observation.key)) }
+                                    />
                                 </div>
                             ))
                         }
@@ -522,7 +708,9 @@ export default function Form(props: FormProps): JSX.Element {
             setDeathDate("");
             setDeathPlace("");
 
+            setGender("male")
             setPartners([]);
+            setObservations([])
         }
 
         toast.success("Pessoa criada com sucesso!");

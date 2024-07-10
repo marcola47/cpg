@@ -58,6 +58,35 @@
                 grid-row: 3;
             }
 
+            &Gender {
+                grid-column: 2;
+                grid-row: 4;
+
+                .male {
+                    color: #fff;
+                    background-color: $blue-mid;
+
+                    svg {
+                        color: #fff;
+                    }
+                }
+
+                .female {
+                    color: #fff;
+                    background-color: $orange-800;
+
+                    svg {
+                        color: #fff;
+                    }
+                }
+
+                .btns > * {
+                    width: 100%;
+
+
+                }
+            }
+
             .fields {
                 display: flex;
                 gap: 8px;
@@ -157,29 +186,133 @@
                     align-items: center;
                     gap: 8px;
 
-                    & > * {
+                    .icon {
+                        width: 40px;
+                        height: 40px;
+                        padding: 8px;
+                        border: 2px solid $orange-700;
+                        border-radius: $br-s;
+
+                        color: $orange-700;
+                        background-color: $orange-50;
+
+                        cursor: pointer;
+                        @include transition;
+
+                        &:hover {
+                            color: #fff;
+                            background-color: $orange-700;
+                        }
+                    }
+
+                    .person {
+                        display: flex;
+                        gap: 8px;
+                        width: 100%;
+
+                        & > * {
+                            padding: 8px;
+                            border: 2px solid $grey-dark;
+                            border-radius: $br-s;
+                        }
+
+                        .name {
+                            flex-grow: 1;
+                        }
+
+                        .date, .place {
+                            max-width: 156px;
+                        }
+
+                        span {
+                            display: inline-block;
+                            min-width: 48px;
+                        }
+                    }
+                }
+            }
+        }
+
+        .observations {
+            grid-column: span 2;
+            
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+
+            .inputs {
+                display: grid;
+                grid-template-columns: 5fr 8px 10fr 40px;
+                gap: 8px;
+                margin-bottom: 16px;
+
+                .field {
+                    padding: 8px;
+                    border: 2px solid $grey-dark;
+                    border-radius: $br-s;
+                }
+                
+                .colon {
+                    font-size: 1.8rem;
+                }
+
+                .add {
+                    width: 40px;
+                    height: 40px;
+                    padding: 8px;
+                    border: 2px solid $green-mid;
+                    border-radius: $br-s;
+
+                    color: $green-mid;
+                    background-color: lighten($green-light, 35%);
+
+                    cursor: pointer;
+                    @include transition;
+
+                    &:hover {
+                        color: #fff;
+                        background-color: $green-mid;
+                    }
+                }
+            }
+
+            .data {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+
+                .observation {
+                    display: grid;
+                    grid-template-columns: 5fr 8px 10fr 40px;    
+                    gap: 8px;
+
+                    .text {
+                        flex-grow: 1;
                         padding: 8px;
                         border: 2px solid $grey-dark;
                         border-radius: $br-s;
                     }
 
-                    .icon {
+                    .colon {
+                        font-size: 1.8rem;
+                    }
+    
+                    .remove {
                         width: 40px;
                         height: 40px;
+                        padding: 8px;
+                        border: 2px solid $orange-700;
+                        border-radius: $br-s;
+    
+                        color: $orange-700;
+                        background-color: $orange-50;
+    
                         cursor: pointer;
                         @include transition;
-
+    
                         &:hover {
-                            background-color: $orange-500;
-                        }
-                    }
-
-                    .person {
-                        width: 100%;
-
-                        span {
-                            display: inline-block;
-                            min-width: 48px;
+                            color: #fff;
+                            background-color: $orange-700;
                         }
                     }
                 }
