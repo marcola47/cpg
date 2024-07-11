@@ -534,16 +534,11 @@ export default function Form(props: FormProps): JSX.Element {
 
                     <div className={ clsx(s.people) }>
                         {
-<<<<<<< HEAD
-                            partners.map((person: Person) => (
-                                <div className={ clsx(s.partner) } key={person.id}>
-=======
                             partners.map((partner: Partner) => (
                                 <div 
                                     className={ clsx(s.partner) }
                                     key={ partner.person.id }
                                 >
->>>>>>> bb4ad9964ef938b59bb7f5426fa7f3b7409466bb
                                     <FaMinus 
                                         className={ clsx(s.icon) }
                                         onClick={ () => setPartners(partners.filter(p => p.person.id !== partner.person.id)) }
