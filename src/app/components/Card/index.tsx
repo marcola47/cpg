@@ -113,6 +113,7 @@ export function CardAdd(props: CardAddProps): JSX.Element {
                         value={ name }
                         onChange={ e => setName(e.currentTarget.value) }
                         onClick={ e => e.stopPropagation() }
+                        onKeyDown={ e => e.key === "Enter" && handleCreate(e) }
                         autoFocus
                     />
 
@@ -153,35 +154,38 @@ export function CardAdd(props: CardAddProps): JSX.Element {
         setName("");
     }
 
-    async function handleCreate(e: React.MouseEvent) {
+    async function handleCreate(e: React.MouseEvent | React.KeyboardEvent) {
         e.stopPropagation()
         setReqSent(true);
 
-        const res = await fetch("/api/familia", {
-            method: "POST",
-            headers: {
-                "Content-type": "application/json"
-            },
-            body: JSON.stringify({
-                nome: name
+        if (name) {
+            const res = await fetch("/api/familia", {
+                method: "POST",
+                headers: {
+                    "Content-type": "application/json"
+                },
+                body: JSON.stringify({
+                    nome: name
+                })
             })
-        })
-
-        if (!res.ok) {
-            if (res.status === 409)
-                toast.error(`Família de nome ${name} já existe.`);
-
-            else
-                toast.error("Ocorreu um erro ao criar a família.");
-
-            setReqSent(false);
-            return;
+    
+            if (!res.ok) {
+                if (res.status === 409)
+                    toast.error(`Família de nome ${name} já existe.`);
+    
+                else
+                    toast.error("Ocorreu um erro ao criar a família.");
+    
+                setReqSent(false);
+                return;
+            }
+    
+            const newFamily = await res.json();
+            const newFamilies = [...families, newFamily]
+    
+            setFamilies(newFamilies.sort((a: Family, b: Family) => a.nome.localeCompare(b.nome)));
         }
 
-        const newFamily = await res.json();
-        const newFamilies = [...families, newFamily]
-
-        setFamilies(newFamilies.sort((a: Family, b: Family) => a.nome.localeCompare(b.nome)));
         setInputShown(false);
         setReqSent(false);
         setName("");

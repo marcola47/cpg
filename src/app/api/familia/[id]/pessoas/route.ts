@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
+function getDescendants() {
+    
+}
+
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
     try {
         const peopleIds = await prisma.familiaPessoa.findMany({
@@ -10,18 +14,40 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
         })
 
         const people = await prisma.pessoa.findMany({
+            orderBy: {
+                dataNascimento: "asc"
+            },
             where: {
                 id: {
                     in: peopleIds.map(p => p.pessoaId)
                 }
             },
             include: {
-                esposo: true,
-                esposa: true,
-                paiDe: true,
-                maeDe: true,
+                esposo: {
+                    select: {
+                        esposaId: true
+                    }
+                },
+                esposa: {
+                    select: {
+                        esposoId: true
+                    }
+                },
+                paiDe: {
+                    select: {
+                        id: true
+                    }
+                },
+                maeDe: {
+                    select: {
+                        id: true
+                    }
+                },
             }
         })
+
+        const orderedPeople: Person[] = [];
+        console.log(people.map(p => p.nome))
 
         return new NextResponse(
             JSON.stringify(people), 

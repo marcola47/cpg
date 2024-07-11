@@ -42,6 +42,10 @@ $colors: (
     width: $w12;
 }
 
+.thin {
+    padding: 4px 12px;
+}
+
 @each $color-name, $color-value in $colors {
     .color {
         &#{ $color-name } {
@@ -71,6 +75,10 @@ $colors: (
 }
 
 .trans {
+    &Shadow:hover {
+        box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+    }
+
     &Grow {
         &Small {
             &:hover {

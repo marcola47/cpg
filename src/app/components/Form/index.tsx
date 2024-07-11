@@ -25,13 +25,14 @@ type Observation = {
 }
 
 type FormProps = {
-    type: "create" | "edit";
-    location: "page" | "modal";
-    person?: Partial<Person>
+    type: "create" | "edit",
+    location: "page" | "modal",
+    onClose?: () => any,
+    person?: Partial<Person>,
 }
 
 export default function Form(props: FormProps): JSX.Element {
-    const { type, location, person } = props;
+    const { type, location, onClose, person } = props;
     const router = useRouter();
 
     const [loading, setLoading] = useState<boolean>(true);
@@ -153,13 +154,16 @@ export default function Form(props: FormProps): JSX.Element {
 
     return (
         <form 
-            className={ clsx(s.form) }
+            className={ clsx(s.form, location === "modal" && s.formModal) }
             onSubmit={ handleSubmit }
             onKeyDown={ e => e.key === "Enter" && e.preventDefault() }
         >
             {
                 location === "modal" &&
-                <FaArrowLeft className={ clsx(s.close) }/>
+                <FaArrowLeft 
+                    className={ clsx(s.close) }
+                    onClick={ onClose }
+                />
             }
 
             <h2 className={ clsx(s.title) }>

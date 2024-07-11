@@ -52,11 +52,11 @@ model Pessoa {
     esposo           Casamento[]     @relation("esposo")
     familias         FamiliaPessoa[]
     
-    genitor          Pessoa?         @relation("GenitorFilho", fields: [genitorId], references: [id])
-    familiaGenitor   Familia?        @relation("GenitorFamilia", fields: [genitorFamilia], references: [id])
+    genitor          Pessoa?         @relation("GenitorFilho", fields: [genitorId], references: [id], onDelete: SetNull)
+    familiaGenitor   Familia?        @relation("GenitorFamilia", fields: [genitorFamilia], references: [id], onDelete: SetNull)
     paiDe            Pessoa[]        @relation("GenitorFilho")
-    genitora         Pessoa?         @relation("GenitoraFilho", fields: [genitoraId], references: [id])
-    familiaGenitora  Familia?        @relation("GenitoraFamilia", fields: [genitoraFamilia], references: [id])
+    genitora         Pessoa?         @relation("GenitoraFilho", fields: [genitoraId], references: [id], onDelete: SetNull)
+    familiaGenitora  Familia?        @relation("GenitoraFamilia", fields: [genitoraFamilia], references: [id], onDelete: SetNull)
     maeDe            Pessoa[]        @relation("GenitoraFilho")
 }
 

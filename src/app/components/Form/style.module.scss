@@ -9,7 +9,31 @@
     padding: 48px;
     border-radius: $br-m;
 
+    background-color: #fff;
     box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.15);
+
+    &Modal {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+
+        @media screen and (max-width: 1680px) {
+            zoom: 0.75;
+        }
+
+        @media screen and (max-width: 1440px) {
+            zoom: 0.65;
+        }
+        
+        @media screen and (max-width: 1280px) {
+            zoom: 0.55;
+        }
+
+        @media screen and (max-width: 1024px) {
+            zoom: 0.50;
+        }
+    }
 
     .close {
         position: absolute;
