@@ -10,8 +10,6 @@ export async function GET(req: NextRequest) {
             }
         });
 
-        console.log(membros)
-
         return new NextResponse(
             JSON.stringify(membros), 
             { status: 200 }

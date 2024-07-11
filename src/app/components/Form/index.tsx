@@ -25,18 +25,22 @@ type Observation = {
 }
 
 type FormProps = {
-    type: "create" | "edit";
-    location: "page" | "modal";
-    person?: Partial<Person>
+    type: "create" | "edit",
+    location: "page" | "modal",
+    onClose?: () => any,
+    person?: Partial<Person>,
 }
 
 export default function Form(props: FormProps): JSX.Element {
-    const { type, location, person } = props;
+    const { type, location, onClose, person } = props;
     const router = useRouter();
 
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<any>("");
     
+    const [people, setPeople] = useState<Person[]>([])
+    const [families, setFamilies] = useState<Person[]>([])
+
     const [fatherListShown, setFatherListShown] = useState<boolean>(false);
     const [fatherRefType, setFatherRefType] = useState<"id" | "family">("id")
     const [fatherFilter, setFatherFilter] = useState<string>("")
@@ -52,9 +56,6 @@ export default function Form(props: FormProps): JSX.Element {
     const [partnersListShown, setPartnersListShown] = useState<boolean>(false);
     const [partnersFilter, setPartnersFilter] = useState<string>("");
     const [partnersPeople, setPartnersPeople] = useState<Person[]>([])
-    
-    const [people, setPeople] = useState<Person[]>([])
-    const [families, setFamilies] = useState<Person[]>([])
     
     const [name, setName] = useState<string>(person?.nome || "")
     const [fatherId, setFatherId] = useState<string>(person?.genitorId || "");
@@ -153,12 +154,16 @@ export default function Form(props: FormProps): JSX.Element {
 
     return (
         <form 
-            className={ clsx(s.form) }
+            className={ clsx(s.form, location === "modal" && s.formModal) }
             onSubmit={ handleSubmit }
+            onKeyDown={ e => e.key === "Enter" && e.preventDefault() }
         >
             {
                 location === "modal" &&
-                <FaArrowLeft className={ clsx(s.close) }/>
+                <FaArrowLeft 
+                    className={ clsx(s.close) }
+                    onClick={ onClose }
+                />
             }
 
             <h2 className={ clsx(s.title) }>
@@ -182,7 +187,7 @@ export default function Form(props: FormProps): JSX.Element {
                         type="text" 
                         name="name"
                         id="name"
-                        placeholder="Apenas o nome sem sobrenome"
+                        placeholder="Fulano Soprano Ferrari"
                         value={ name }
                         onChange={ e => setName(e.currentTarget.value) }
                         autoComplete="off"
@@ -692,14 +697,47 @@ export default function Form(props: FormProps): JSX.Element {
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        console.log("submitted")
+
+        const res = await fetch("/api/pessoa", {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json",
+            },
+            body: JSON.stringify({
+                nome: name,
+                genitorId: fatherId,
+                genitorFamilia: fatherFamily,
+                genitoraId: motherId,
+                genitoraFamilia: motherFamily,
+
+                dataNascimento: birthDate,
+                localNascimento: birthPlace,
+                dataBatismo: baptismDate,
+                localBatismo: baptismPlace,
+                dataFalecimento: deathDate,
+                localFalecimento: deathPlace,
+
+                genero: gender,
+                casamentos: partners,
+                observacoes: observations
+            })
+        })
+
+        if (!res.ok) {
+            toast.error("Ocorreu um erro ao criar pessoa. Por favor, verifique os dados e tente novamente.")
+            return;
+        }
+
+        console.log(await res.json());
 
         if (type === "create") {
             setName("");
             setFatherId("");
             setFatherFamily("");
+            setFatherFilter("");
             setMotherId("");
             setMotherFamily("");
+            setMotherFilter("");
             
             setBirthDate("");
             setBirthPlace("");
@@ -711,9 +749,12 @@ export default function Form(props: FormProps): JSX.Element {
             setGender("male")
             setPartners([]);
             setObservations([])
+
+            toast.success("Pessoa criada com sucesso!");
         }
 
-        toast.success("Pessoa criada com sucesso!");
+        else 
+            toast.success("Pessoa editada com sucesso!")
     }
 
     async function getPeopleAndFamilies() {

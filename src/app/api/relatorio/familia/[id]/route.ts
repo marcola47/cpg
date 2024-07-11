@@ -17,17 +17,13 @@ export async function POST(req: NextRequest, context: { params: FindById }) {
                 { status: 400 }
             );
         }
-
-
+        
         const familia = await prisma.familia.findFirst({
             where: {
                 id: context.params.id
             }
         });
         
-        console.log(familia);
-        
-
         if (!familia) {
             return new NextResponse(
                 JSON.stringify({ error: "Familia não encontrada" }), 
@@ -107,9 +103,6 @@ export async function POST(req: NextRequest, context: { params: FindById }) {
 
             stringFamily += '\n';            
         }   
-
-        console.log("chegou aqui");
-        
 
         const relatorio = await prisma.relatorio.create({
             data: {

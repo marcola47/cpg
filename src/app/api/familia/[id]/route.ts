@@ -13,6 +13,9 @@ export async function GET(req: NextRequest, context: {params: FindById}) {
             }
         });
 
+        if (!familia)
+            throw new Error("404_Familia não encontrada.")
+
         return new NextResponse(
             JSON.stringify(familia), 
             { status: 200 }

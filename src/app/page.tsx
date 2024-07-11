@@ -28,7 +28,10 @@ export default function Page(): JSX.Element | null {
     useEffect(() => {
         setFamiliesFiltered(families.filter(f => f.nome.toLowerCase().includes(filter)))
     }, [filter, families])
-
+    
+    if (loading)
+        return <PageLoading/>
+        
     if (error) {
         return (
             <PageError
@@ -38,8 +41,7 @@ export default function Page(): JSX.Element | null {
         )
     }
 
-    if (loading)
-        return <PageLoading/>
+
 
     return (
         <div className={ clsx(app.page, s.home) }>

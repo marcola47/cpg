@@ -52,12 +52,12 @@ model Pessoa {
     esposo           Casamento[]     @relation("esposo")
     familias         FamiliaPessoa[]
     
-    genitor          Pessoa?         @relation("GenitorFilho", fields: [genitorId], references: [id])
-    familiaGenitor   Familia?        @relation("GenitorFamilia", fields: [genitorFamilia], references: [id])
-    filhode          Pessoa[]        @relation("GenitorFilho")
-    genitora         Pessoa?         @relation("GenitoraFilho", fields: [genitoraId], references: [id])
-    familiaGenitora  Familia?        @relation("GenitoraFamilia", fields: [genitoraFamilia], references: [id])
-    filhoda          Pessoa[]        @relation("GenitoraFilho")
+    genitor          Pessoa?         @relation("GenitorFilho", fields: [genitorId], references: [id], onDelete: SetNull)
+    familiaGenitor   Familia?        @relation("GenitorFamilia", fields: [genitorFamilia], references: [id], onDelete: SetNull)
+    paiDe            Pessoa[]        @relation("GenitorFilho")
+    genitora         Pessoa?         @relation("GenitoraFilho", fields: [genitoraId], references: [id], onDelete: SetNull)
+    familiaGenitora  Familia?        @relation("GenitoraFamilia", fields: [genitoraFamilia], references: [id], onDelete: SetNull)
+    maeDe            Pessoa[]        @relation("GenitoraFilho")
 }
 
 model Casamento {
@@ -65,8 +65,8 @@ model Casamento {
     esposaId       String
     dataCasamento  DateTime?
     localCasamento String?
-    esposa         Pessoa    @relation("esposa", fields: [esposaId], references: [id])
-    esposo         Pessoa    @relation("esposo", fields: [esposoId], references: [id])
+    esposa         Pessoa    @relation("esposa", fields: [esposaId], references: [id], onDelete: Cascade)
+    esposo         Pessoa    @relation("esposo", fields: [esposoId], references: [id], onDelete: Cascade)
 
     @@id([esposoId, esposaId])
 }
@@ -90,6 +90,6 @@ model Relatorio {
     userId        String
     createdAt     DateTime @default(now())
     updatedAt     DateTime @updatedAt
-    familia       Familia  @relation(fields: [idFamilia], references: [id])
-    user          User     @relation(fields: [userId], references: [id])
+    familia       Familia  @relation(fields: [idFamilia], references: [id], onDelete: Cascade)
+    user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

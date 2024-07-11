@@ -20,9 +20,10 @@ type CommonBtnProps = {
     icon?: React.ReactElement,
     iconColor?: colors,
     
-    transition?: "grow" | "fill" | "border" | "bg" | "color",
+    transition?: "shadow" | "grow" | "fill" | "border" | "bg" | "color",
     fillColor?: colors,
     fullWidth?: boolean,
+    thin?: boolean,
     type?: "button" | "submit"
 }
 
@@ -70,6 +71,7 @@ export function Btn(props: BtnProps): JSX.Element {
         transition,
         fillColor,
         fullWidth,
+        thin,
         type
     } = props;
     
@@ -107,6 +109,7 @@ export function Btn(props: BtnProps): JSX.Element {
         s[btnFillColor],
         loading && s.loading,
         fullWidth && s.fullWidth,
+        thin && s.thin,
     ) 
 
     if (link) {
