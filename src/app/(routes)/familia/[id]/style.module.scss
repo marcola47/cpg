@@ -34,16 +34,18 @@
             }
 
             .input {
+                width: 100%;
                 padding: 8px 8px 8px 32px;
                 border-radius: $br-m;
-            }
+            } 
         }
     }
 
     .people {
+        overflow-x: auto;
         position: relative;
         height: 70dvh;
-        outline: 2px solid red;
+        @include scrollbar_small;
 
         .warning {
             position: absolute;
@@ -55,6 +57,38 @@
             color: $grey-mid;
             font-size: 2.8rem;
             text-align: center;
+        }
+
+        .labels {
+            display: flex;
+            padding: 16px;
+            border-bottom: 2px solid $orange-500;
+                        
+            .label {
+                flex-shrink: 0;
+                width: 256px;
+                font-weight: 500;
+
+                &Actions {
+                    width: 156px;
+                }
+
+                &Date {
+                    width: 192px;
+                }
+
+                &Obs {
+                    width: 384px;
+                }
+            }
+        }
+
+        .values {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+
+            @include scrollbar_small;
         }
     }
 }

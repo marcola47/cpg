@@ -15,7 +15,7 @@ export function formatCPF(value: string) : string {
   return cpf;
 }
 
-export function formatDate(value: string): string {
+export function formatDate(value: string | Date): string {
   function isValidDay(day: number, month: number, year: number): boolean {
     const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
@@ -25,7 +25,8 @@ export function formatDate(value: string): string {
     return month >= 1 && month <= 12 && day >= 1 && day <= daysInMonth[month - 1];
   }
 
-  let date = value.replace(/\D/g, "");
+
+  let date = value.toString().replace(/\D/g, "");
 
   let day = date.substring(0, 2);
   let month = date.substring(2, 4);

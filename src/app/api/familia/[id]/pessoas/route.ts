@@ -23,6 +23,16 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
                 }
             },
             include: {
+                genitor: {
+                    select: {
+                        nome: true
+                    }
+                },
+                genitora: {
+                    select: {
+                        nome: true
+                    }
+                },
                 esposo: {
                     select: {
                         esposaId: true

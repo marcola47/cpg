@@ -79,6 +79,7 @@ export default function Form(props: FormProps): JSX.Element {
     // POG: Programação Orientada a Gambiarra
     useEffect(() => {
         getPeopleAndFamilies();
+        console.log(person)
     }, [])
 
     useEffect(() => { console.log(partners) }, [partners])
@@ -751,6 +752,7 @@ export default function Form(props: FormProps): JSX.Element {
             setObservations([])
 
             toast.success("Pessoa criada com sucesso!");
+            router.refresh();
         }
 
         else 

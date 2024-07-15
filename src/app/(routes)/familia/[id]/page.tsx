@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 import { FaUserPlus, FaMagnifyingGlass } from "react-icons/fa6";
 import PageLoading from "@/app/loading";
 import PageError from "@/app/error";
+import Row from "@/app/components/Row";
 import Form from "@/app/components/Form";
 import { Btn } from "@/app/components/Btn";
 
@@ -18,14 +19,16 @@ export default function Page({ params }: { params: { id: string } }): JSX.Elemen
     
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<any>();
-    const [formShown, setFormShown] = useState<boolean>(false);
-    
+    const [formCreateShown, setFormCreateShown] = useState<boolean>(false);
+    const [formEditShown, setFormEditShown] = useState<boolean>(false);
+    const [formPerson, setFormPerson] = useState<Person | undefined>()
+
     const [family, setFamily] = useState<Family | null>(null);
     const [people, setPeople] = useState<Person[]>([]);
 
     const [filter, setFilter] = useState<string>("");
     const [filteredPeople, setFilteredPeople] = useState<Person[]>([])
-
+    
     useEffect(() => {
         if (params.id) {
             getFamily(params.id);
@@ -35,7 +38,7 @@ export default function Page({ params }: { params: { id: string } }): JSX.Elemen
 
     useEffect(() => {
         setFilteredPeople(people.filter(p => p.nome.toLowerCase().includes(filter.toLowerCase())))
-    }, [])
+    }, [filter])
 
     if (loading)
         return <PageLoading/>
@@ -52,13 +55,28 @@ export default function Page({ params }: { params: { id: string } }): JSX.Elemen
     return (
         <div className={ clsx(app.page, s.page) }>
             {
-                formShown &&
+                formCreateShown &&
                 createPortal(
                     <div className={ clsx(app.backdrop) }>
                         <Form
                             type="create"
                             location="modal"
-                            onClose={ () => setFormShown(false) }
+                            onClose={ () => setFormCreateShown(false) }
+                        />
+                    </div>, 
+                    document.body
+                )
+            }
+
+            {
+                formEditShown &&
+                createPortal(
+                    <div className={ clsx(app.backdrop) }>
+                        <Form
+                            type="edit"
+                            location="modal"
+                            person={ formPerson }
+                            onClose={ () => setFormEditShown(false) }
                         />
                     </div>, 
                     document.body
@@ -91,7 +109,7 @@ export default function Page({ params }: { params: { id: string } }): JSX.Elemen
                 </div>
 
                 <Btn
-                    onClick={ () => setFormShown(true) }
+                    onClick={ () => setFormCreateShown(true) }
 
                     color="black"
                     borderColor="black"
@@ -111,6 +129,62 @@ export default function Page({ params }: { params: { id: string } }): JSX.Elemen
                     <div className={ clsx(s.warning) }>
                         Esta familia ainda não possui pessoas cadastradas
                     </div>
+                }
+
+                {
+                    people.length > 0 &&
+                    <>
+                        <div className={ clsx(s.labels) }>
+                            <div className={ clsx(s.label, s.labelActions) }>
+                                Ações
+                            </div>
+
+                            <div className={ clsx(s.label) }>
+                                Pessoa
+                            </div>
+
+                            <div className={ clsx(s.label) }>
+                                Genitor/Genitora
+                            </div>
+
+                            <div className={ clsx(s.label, s.labelDate) }>
+                                Nascimento
+                            </div>
+
+                            <div className={ clsx(s.label, s.labelDate) }>
+                                Batizado
+                            </div>
+
+                            <div className={ clsx(s.label, s.labelDate) }>
+                                Óbito
+                            </div>
+
+                            <div className={ clsx(s.label, s.labelDate) }>
+                                Matrimonio
+                            </div>
+
+                            <div className={ clsx(s.label, s.labelObs) }>
+                                Observações
+                            </div>
+                        </div>
+
+                        <div className={ clsx(s.separator) }/>
+
+                        <div className={ clsx(s.values) }>
+                            {
+                                filteredPeople.map(person => (
+                                    <Row
+                                        key={ person.id }
+                                        person={ person }
+                                        showForm={ () => {
+                                            setFormEditShown(true);
+                                            setFormPerson(person);
+                                        } }
+                                    />
+                                ))
+                            }
+                        </div>
+                    </>
                 }
             </div>
         </div>
@@ -142,6 +216,8 @@ export default function Page({ params }: { params: { id: string } }): JSX.Elemen
             throw new Error("500_Não foi possivel buscar as pessoas desta família.")
     
         const data = await res.json();
+        console.log(data)
+
         setPeople(data);
         setFilteredPeople(data);
         setLoading(false);
