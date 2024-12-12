@@ -1,0 +1,190 @@
+@use "@/styles/vars.module.scss" as *;
+
+.table {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  .togglers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    &Left {
+      justify-content: flex-start;
+    }
+    
+    &Center {
+      justify-content: center;
+    }
+
+    &Right {
+      justify-content: flex-end;
+    }
+  }
+  
+  .data {
+    overflow: auto;
+    position: relative;
+    max-height: 560px;
+    border: 2px solid $grey-40;
+    border-radius: $br-m;
+    scroll-behavior: smooth;
+    
+    & > :first-child {
+      height: 100%;
+    }
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    .labels {
+      display: flex;
+      
+      position: sticky;
+      top: 0;
+      width: 100%;
+
+      & > :not(:last-child) {
+        flex-shrink: 0;
+        border-right: 2px solid $grey-40;
+      }
+
+      .label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        
+        min-height: 40px;
+        padding: 8px 12px;
+        border-bottom: 2px solid $grey-40;
+        
+        background-color: $grey-80;
+        font-weight: 500;
+        cursor: pointer;
+        user-select: none;
+  
+        .directions {
+          display: flex;
+          flex-direction: column;
+          
+          .caret {
+            color: $grey-50;
+            @include transition;
+
+            &Down {
+              margin-top: -8px;
+            }
+
+            &Selected {
+              color: $grey-5;
+            };
+          }
+        }
+      }
+    }
+  
+    .rows {       
+      .row {
+        display: flex;
+        align-items: center;
+        
+        & > :not(:last-child) {
+          flex-shrink: 0;
+          border-right: 2px solid $grey-70;
+        }   
+        
+        .field {
+          min-height: 40px;
+          padding: 8px 12px;
+          border-bottom: 2px solid $grey-70;
+
+          white-space: nowrap;
+          overflow-x: hidden;
+          text-overflow: ellipsis;
+
+          @each $color-name, $color-value in $colors-main {
+            &#{ $color-name } {
+              color: $color-value;
+            }
+          }
+        }
+        
+        .clickable {
+          color: $blue-25;
+          cursor: pointer;
+          text-decoration: underline;
+        }
+      }  
+    }
+  }
+
+  .width {
+    &Last {
+      &Xs  { min-width: 160px; width: 100%; }
+      &S   { min-width: 192px; width: 100%; }
+      &M   { min-width: 224px; width: 100%; }
+      &L   { min-width: 256px; width: 100%; }
+      &Xl  { min-width: 288px; width: 100%; }
+      &Xxl { min-width: 320px; width: 100%; }  
+    }
+    
+    &Xs  { width: 160px; }
+    &S   { width: 192px; }
+    &M   { width: 224px; }
+    &L   { width: 256px; }
+    &Xl  { width: 288px; }
+    &Xxl { width: 320px; }
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .table {
+    .togglers {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      place-items: center;
+
+      .toggler {
+        width: 100%;
+
+        &:last-child:nth-child(odd) {
+          grid-column: span 2;
+        }
+
+        .checkbox {
+          width: 100%;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 520px) {
+  .table {
+    .data {
+      .label, .field {
+        min-width: 100%;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .table {
+    .togglers {
+      display: flex;
+      flex-direction: column;
+      flex-wrap: nowrap;
+      
+      .toggler {
+        width: 100%;
+
+        .checkbox {
+          width: 100%;
+        }
+      }
+    }
+  }
+}

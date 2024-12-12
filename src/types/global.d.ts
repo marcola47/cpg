@@ -24,6 +24,20 @@ declare global {
     type FamilyPerson = FamiliaPessoaPrisma;
     type Marriage = CasamentoPrisma;
     type StateSetter<T> = React.Dispatch<React.SetStateAction<T>>;
+
+    type Color = 
+    "black"  | 
+    "white"  | 
+    "grey"   | 
+    "pink"   | 
+    "salmon" | 
+    "orange" | 
+    "purple" | 
+    "violet" | 
+    "blue"   | 
+    "green"  | 
+    "yellow" | 
+    "red"    
 }
 
 export {};
